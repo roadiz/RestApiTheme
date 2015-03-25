@@ -1,0 +1,16 @@
+---
+name: "RZ RestApi theme"
+author: "REZO ZERO"
+copyright: "REZO ZERO"
+themeDir: "RestApiTheme"
+supportedLocale:
+    - "en"
+    - "fr"
+versionRequire: "0.6.0"
+importFiles:
+    roles: []
+    groups: []
+    settings: []
+    nodetypes: []
+    tags: []
+    nodes: []

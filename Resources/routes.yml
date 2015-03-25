@@ -1,0 +1,20 @@
+# This route is required!
+homePage:
+    path:     /
+    defaults: { _controller: Themes\RestApiTheme\RestApiThemeApp::homeAction }
+homePageLocale:
+    path:     /{_locale}
+    defaults: { _controller: Themes\RestApiTheme\RestApiThemeApp::homeAction }
+    requirements:
+        # Use every 2 letter codes (quick and dirty)
+        _locale: "[a-z]{2}"
+
+sitemap:
+    path:     /sitemap.xml
+    defaults: { _controller: Themes\RestApiTheme\Controllers\SitemapController::sitemapAction }
+defaultRemoveTrailingSlash:
+    path: /{url}
+    defaults: { _controller: Themes\RestApiTheme\RestApiThemeApp::removeTrailingSlashAction }
+    requirements:
+        url: .*/$
+    methods: [GET]
