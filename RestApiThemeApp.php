@@ -16,17 +16,18 @@ use RZ\Roadiz\Core\Bags\SettingsBag;
 use RZ\Roadiz\Core\Entities\Node;
 use RZ\Roadiz\Core\Entities\Translation;
 use Symfony\Component\HttpFoundation\Request;
+use Pimple\Container;
 
 /**
  * RestApiThemeApp class
  */
 class RestApiThemeApp extends FrontendController
 {
-    const VERSION = '0.6.2';
+    const VERSION = '0.7';
 
-    protected static $themeName = 'RZ RestApi theme';
-    protected static $themeAuthor = 'REZO ZERO';
-    protected static $themeCopyright = 'REZO ZERO';
+    protected static $themeName = 'RestApi theme';
+    protected static $themeAuthor = 'Maxime Constantinian';
+    protected static $themeCopyright = 'Ambroise Maupate, Julien Blanchet';
     protected static $themeDir = 'RestApiTheme';
     protected static $backendTheme = false;
     protected static $specificNodesControllers = array(
@@ -48,9 +49,7 @@ class RestApiThemeApp extends FrontendController
          * Get language from static route
          */
         $translation = $this->bindLocaleFromRoute($request, $_locale);
-        $home = $this->getService('em')
-                     ->getRepository('RZ\Roadiz\Core\Entities\Node')
-                     ->findHomeWithTranslation($translation);
+        $home = $this->getHome($translation);
 
         $this->prepareThemeAssignation($home, $translation);
         /*
@@ -145,8 +144,8 @@ class RestApiThemeApp extends FrontendController
                         ->getBy(
                             [
                                 // Get children nodes from Homepage
-                    // use parent => $this->getRoot() to get root nodes instead
-                    'parent' => $parent,
+                                // use parent => $this->getRoot() to get root nodes instead
+                                'parent' => $parent,
                                 'translation' => $this->translation,
                             ],
                             ['position' => 'ASC']
@@ -154,5 +153,43 @@ class RestApiThemeApp extends FrontendController
         }
 
         return null;
+    }
+
+    /**
+     * Append objects to global container.
+     *
+     * @param Pimple\Container $container
+     */
+    public static function setupDependencyInjection(Container $container)
+    {
+        parent::setupDependencyInjection($container);
+
+        $container->extend('twig.loaderFileSystem', function (\Twig_Loader_Filesystem $loader, $c) {
+            $loader->addPath(static::getViewsFolder());
+            return $loader;
+        });
+
+        $container->extend('backoffice.entries', function (array $entries, $c) {
+
+            /*
+             * Add a test entry in your Backoffice
+             */
+            $entries['api'] = array(
+                'name' => 'Manage API',
+                'path' => null,
+                'icon' => 'uk-icon-file-text-o',
+                'roles' => null,//array('ROLE_ACCESS_NEWS', 'ROLE_ACCESS_NEWS_DELETE'),
+                'subentries' => array(
+                    'clientList' => array(
+                        'name' => 'List Client',
+                        'path' => $c['urlGenerator']->generate('clientAdminListPage'),
+                        'icon' => 'uk-icon-file-text-o',
+                        'roles' => null//array('ROLE_ACCESS_NEWS')
+                    )
+                )
+            );
+
+            return $entries;
+        });
     }
 }

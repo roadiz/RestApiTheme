@@ -1,12 +1,12 @@
 ---
-name: "RZ RestApi theme"
-author: "REZO ZERO"
-copyright: "REZO ZERO"
+name: "RestApi theme"
+author: "maxime constantinian"
+copyright: "Ambroise Maupate, Julien Blanchet"
 themeDir: "RestApiTheme"
 supportedLocale:
     - "en"
     - "fr"
-versionRequire: "0.6.0"
+versionRequire: "0.7"
 importFiles:
     roles: []
     groups: []
