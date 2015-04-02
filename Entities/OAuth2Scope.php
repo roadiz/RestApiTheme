@@ -62,7 +62,7 @@ class OAuth2Scope extends AbstractEntity
       *
       * @return $this
       */
-      public function setName() {
+      public function setName($name) {
           $this->name = $name;
           return $this;
       }

@@ -1,14 +1,5 @@
 <?php
-/*
- * Copyright REZO ZERO 2015
- *
- * RestApiTheme main class.
- * Entry point for your theme logic and inheritance.
- *
- * @file RestApiThemeApp.php
- * @copyright REZO ZERO 2015
- * @author Ambroise Maupate
- */
+
 namespace Themes\RestApiTheme;
 
 use RZ\Roadiz\CMS\Controllers\FrontendController;
@@ -183,6 +174,12 @@ class RestApiThemeApp extends FrontendController
                     'clientList' => array(
                         'name' => 'List Client',
                         'path' => $c['urlGenerator']->generate('clientAdminListPage'),
+                        'icon' => 'uk-icon-file-text-o',
+                        'roles' => null//array('ROLE_ACCESS_NEWS')
+                    ),
+                    'scopeList' => array(
+                        'name' => 'List Scope',
+                        'path' => $c['urlGenerator']->generate('scopeAdminListPage'),
                         'icon' => 'uk-icon-file-text-o',
                         'roles' => null//array('ROLE_ACCESS_NEWS')
                     )

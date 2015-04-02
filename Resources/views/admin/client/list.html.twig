@@ -21,7 +21,7 @@
 
 <div class="content-header-action-menu">
     <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
-        {#<a href="{{ path('clientAdminAddPage') }}" class="uk-button"><i class="uk-icon-rz-plus"></i> {% trans %}create.a.client{% endtrans %} </a>#}
+        <a href="{{ path('clientAdminAddPage') }}" class="uk-button"><i class="uk-icon-rz-plus"></i> {% trans %}create.a.client{% endtrans %} </a>
     </div>
 </div>
 
@@ -42,15 +42,15 @@
                 <tbody>
                     {% for client in clients %}
                     <tr>
-                        <td>{{ new.username }}</td>
-                        <td>{{ new.clientId }}</td>
-                        <td>{{ new.clientSecret }}</td>
-                        <td>{{ new.redirectUri }}</td>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.clientId }}</td>
+                        <td>{{ client.clientSecret }}</td>
+                        <td>{{ client.redirectUri }}</td>
                         <td>
                         {% spaceless %}
-                            <a class="uk-button uk-button-content uk-button-small" href="{#{{ path('newsAdminEditPage', { newsId: new.id }) }}#}"
+                            <a class="uk-button uk-button-content uk-button-small" href="{{ path('clientAdminEditPage', { clientId: client.id }) }}"
                                 title="{% trans %}edit.client{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-pencil"></i></a>
-                            <a class="uk-button uk-button-content uk-button-small uk-button-danger uk-button-table-delete" href="{#{{ path('newsAdminDeletePage', { nodeId: new.id }) }}#}"
+                            <a class="uk-button uk-button-content uk-button-small uk-button-danger uk-button-table-delete" href="{{ path('clientAdminDeletePage', { clientId: client.id }) }}"
                                 title="{% trans %}delete{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-trash-o"></i></a>
                         {% endspaceless %}
                         </td>

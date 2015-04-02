@@ -70,22 +70,22 @@ class OAuth2AccessToken extends AbstractEntity
      * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Session")
      * @ORM\JoinColumn(name="session_id", referencedColumnName="id", onDelete="CASCADE")
      **/
-     private $sessionId;
+     private $session;
 
      /**
       * @return Themes\RestApiTheme\Entities\OAuth2Session
       */
-     public function getSessionId() {
-         return $this->sessionId;
+     public function getSession() {
+         return $this->session;
      }
 
      /**
-      * @param Themes\RestApiTheme\Entities\OAuth2Session $ownerId
+      * @param Themes\RestApiTheme\Entities\OAuth2Session $session
       *
       * @return $this
       */
-      public function setSessionId($sessionId) {
-          $this->sessionId = $sessionId;
+      public function setSession($session) {
+          $this->session = $session;
           return $this;
       }
 

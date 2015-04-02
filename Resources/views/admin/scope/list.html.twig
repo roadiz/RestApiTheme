@@ -1,0 +1,60 @@
+{% if not head.ajax %}{% set baseTemplate = 'base.html.twig' %}{% else %}{% set baseTemplate = 'ajaxBase.html.twig' %}{% endif %}{% extends baseTemplate %}
+
+{% block customStyles %}
+<style>
+    /* Custom styles here */
+</style>
+{% endblock %}
+
+{% block customScripts %}
+<script>
+    /* Custom Stripts here */
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="content-global">
+    <header class="content-header">
+        <h1 class="content-title">{% trans %} api.scope.management {% endtrans %}</h1>
+        {% include 'widgets/countFiltersBar.html.twig' %}
+    </header>
+
+<div class="content-header-action-menu">
+    <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+        <a href="{{ path('scopeAdminAddPage') }}" class="uk-button"><i class="uk-icon-rz-plus"></i> {% trans %}create.a.scope{% endtrans %} </a>
+    </div>
+</div>
+
+    {% include 'widgets/filtersBar.html.twig' %}
+
+    <article class="content content-no-action-menu">
+        <div class="content-table-cont">
+            <table class="content-table uk-table">
+                <thead>
+                    <tr>
+                        <th>{% trans %}name{% endtrans %}</th>
+                        <th>{% trans %}description{% endtrans %}</th>
+                        <th>{% trans %}actions{% endtrans %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scope in scopes %}
+                    <tr>
+                        <td>{{ scope.name }}</td>
+                        <td>{{ scope.description }}</td>
+                        <td>
+                        {% spaceless %}
+                            <a class="uk-button uk-button-content uk-button-small" href="{{ path('scopeAdminEditPage', { scopeId: scope.id }) }}"
+                                title="{% trans %}edit.scope{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-pencil"></i></a>
+                            <a class="uk-button uk-button-content uk-button-small uk-button-danger uk-button-table-delete" href="{{ path('scopeAdminDeletePage', { scopeId: scope.id }) }}"
+                                title="{% trans %}delete{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-trash-o"></i></a>
+                        {% endspaceless %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+{% endblock %}

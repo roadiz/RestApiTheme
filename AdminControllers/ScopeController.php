@@ -1,38 +1,10 @@
 <?php
-/**
- * Copyright © 2014, Ambroise Maupate and Julien Blanchet
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is furnished
- * to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
- * Except as contained in this notice, the name of the ROADIZ shall not
- * be used in advertising or otherwise to promote the sale, use or other dealings
- * in this Software without prior written authorization from Ambroise Maupate and Julien Blanchet.
- *
- * @file ClientController.php
- * @author Maxime Constantinian
- */
 
 namespace Themes\RestApiTheme\AdminControllers;
 
 use Themes\Rozier\RozierApp;
 
-use Themes\RestApiTheme\Entities\OAuth2Client;
+use Themes\RestApiTheme\Entities\OAuth2Scope;
 
 use RZ\Roadiz\Core\ListManagers\EntityListManager;
 use RZ\Roadiz\Utils\StringHandler;
@@ -46,7 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ClientController extends RozierApp
+class ScopeController extends RozierApp
 {
 
     public function listAction(
@@ -56,7 +28,7 @@ class ClientController extends RozierApp
         $listManager = new EntityListManager(
             $request,
             $this->getService("em"),
-            "Themes\RestApiTheme\Entities\OAuth2Client",
+            "Themes\RestApiTheme\Entities\OAuth2Scope",
             [],
             array(
               "id" => "DESC"
@@ -66,16 +38,16 @@ class ClientController extends RozierApp
         $listManager->handle();
 
         $this->assignation['filters'] = $listManager->getAssignation();
-        $this->assignation['clients'] = $listManager->getEntities();
+        $this->assignation['scopes'] = $listManager->getEntities();
 
         //$this->getService('stopwatch')->start('twigRender');
 
-        return $this->render('admin/client/list.html.twig', $this->assignation, null,
+        return $this->render('admin/scope/list.html.twig', $this->assignation, null,
                              \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
     }
 
     /**
-     * Handle client creation pages.
+     * Handle scope creation pages.
      *
      * @param Symfony\Component\HttpFoundation\Request $request
      *
@@ -98,10 +70,10 @@ class ClientController extends RozierApp
                 )
             )
             ->add(
-                'redirectUri',
+                'description',
                 'text',
                 array(
-                    'label' => $this->getTranslator()->trans('redirect.uri'),
+                    'label' => $this->getTranslator()->trans('description'),
                     'constraints' => array(
                         new NotBlank()
                     )
@@ -112,17 +84,17 @@ class ClientController extends RozierApp
 
         if ($form->isValid()) {
             try {
-                $client = $this->createClient($form->getData());
+                $scope = $this->createScope($form->getData());
 
                 $msg = $this->getTranslator()->trans(
-                    'oauth.client.%name%.created',
-                    array('%name%'=>$client->getName())
+                    'oauth.scope.%name%.created',
+                    array('%name%'=>$scope->getName())
                 );
                 $this->publishConfirmMessage($request, $msg);
 
                 $response = new RedirectResponse(
                     $this->getService('urlGenerator')->generate(
-                        'clientAdminListPage'
+                        'scopeAdminListPage'
                     )
                 );
                 $response->prepare($request);
@@ -133,7 +105,7 @@ class ClientController extends RozierApp
 
                 $response = new RedirectResponse(
                     $this->getService('urlGenerator')->generate(
-                        'clientAdminAddPage'
+                        'scopeAdminAddPage'
                     )
                 );
                 $response->prepare($request);
@@ -145,29 +117,27 @@ class ClientController extends RozierApp
         $this->assignation['form'] = $form->createView();
 
         return
-            $this->render('admin/client/add.html.twig', $this->assignation, null,
+            $this->render('admin/scope/add.html.twig', $this->assignation, null,
                           \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
     }
 
-    private function createClient($data)
+    private function createScope($data)
     {
-        $client = new OAuth2Client();
-        $client->setName($data["name"]);
-        $client->setRedirectUri($data["redirectUri"]);
-        $client->setClientId(md5(uniqid($data["name"], true)));
-        $client->setClientSecret((new PasswordGenerator)->generatePassword(32));
+        $scope = new OAuth2Scope();
+        $scope->setName($data["name"]);
+        $scope->setDescription($data["description"]);
 
-        $this->getService("em")->persist($client);
+        $this->getService("em")->persist($scope);
         $this->getService("em")->flush();
-        return $client;
+        return $scope;
     }
 
-    public function editAction(Request $request, $clientId)
+    public function editAction(Request $request, $scopeId)
     {
         //$this->validateAccessForRole('ROLE_ACCESS_NEWS');
 
-        $client =  $this->getService("em")->find("Themes\RestApiTheme\Entities\OAuth2Client", $clientId);
-        if ($client === null) {
+        $scope =  $this->getService("em")->find("Themes\RestApiTheme\Entities\OAuth2Scope", $scopeId);
+        if ($scope === null) {
             return $this->throw404();
         }
         $form = $this->getService('formFactory')
@@ -176,7 +146,7 @@ class ClientController extends RozierApp
                 'name',
                 'text',
                 array(
-                    'data' => $client->getName(),
+                    'data' => $scope->getName(),
                     'label' => $this->getTranslator()->trans('name'),
                     'constraints' => array(
                         new NotBlank()
@@ -184,11 +154,11 @@ class ClientController extends RozierApp
                 )
             )
             ->add(
-                'redirectUri',
+                'description',
                 'text',
                 array(
-                    'data' => $client->getRedirectUri(),
-                    'label' => $this->getTranslator()->trans('redirect.uri'),
+                    'data' => $scope->getRedirectUri(),
+                    'label' => $this->getTranslator()->trans('description'),
                     'constraints' => array(
                         new NotBlank()
                     )
@@ -200,21 +170,21 @@ class ClientController extends RozierApp
         if ($form->isValid()) {
             $data = $form->getData();
 
-            $client->setName($data['name']);
-            $client->setRedirectUri($data['redirectUri']);
+            $scope->setName($data['name']);
+            $scope->setDescription($data['description']);
 
             $this->getService('em')->flush();
 
             $msg = $this->getTranslator()->trans(
-                'client.%name%.updated',
-                array('%name%'=>$client->getName())
+                'scope.%name%.updated',
+                array('%name%'=>$scope->getName())
             );
 
             $this->publishConfirmMessage($request, $msg);
 
             $response = new RedirectResponse(
                 $this->getService('urlGenerator')->generate(
-                    'clientAdminListPage'
+                    'scopeAdminListPage'
                 )
             );
             $response->prepare($request);
@@ -223,48 +193,48 @@ class ClientController extends RozierApp
         }
 
         $this->assignation['form'] = $form->createView();
-        $this->assignation['client'] = $client;
+        $this->assignation['scope'] = $scope;
 
-        return $this->render('admin/client/edit.html.twig', $this->assignation, null,
+        return $this->render('admin/scope/edit.html.twig', $this->assignation, null,
                              \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
     }
 
     /**
-     * Return an deletion form for requested client.
+     * Return an deletion form for requested scope.
      *
      * @param Symfony\Component\HttpFoundation\Request $request
-     * @param int                                      $clientId
+     * @param int                                      $scopeId
      *
      * @return Symfony\Component\HttpFoundation\Response
      */
-    public function deleteAction(Request $request, $clientId)
+    public function deleteAction(Request $request, $scopeId)
     {
         //$this->validateAccessForRole('ROLE_ACCESS_NEWS_DELETE');
 
-        $client = $this->getService('em')
-            ->find('Themes\RestApiTheme\Entities\OAuth2Client', (int) $clientId);
+        $scope = $this->getService('em')
+            ->find('Themes\RestApiTheme\Entities\OAuth2Scope', (int) $scopeId);
 
-        if ($client === null) {
+        if ($scope === null) {
             return $this->throw404();
         }
 
-        $form = $this->buildDeleteForm($client);
+        $form = $this->buildDeleteForm($scope);
         $form->handleRequest();
 
         if ($form->isValid() &&
-            $form->getData()['clientId'] == $client->getId()) {
-            $this->getService('em')->remove($client);
+            $form->getData()['scopeId'] == $scope->getId()) {
+            $this->getService('em')->remove($scope);
             $this->getService('em')->flush();
             $msg = $this->getTranslator()->trans(
-                'client.%name%.deleted',
-                array('%name%'=>$client->getName())
+                'scope.%name%.deleted',
+                array('%name%'=>$scope->getName())
             );
             $this->publishConfirmMessage($request, $msg);
             /*
              * Force redirect to avoid resending form when refreshing page
              */
             $response = new RedirectResponse(
-                $this->getService('urlGenerator')->generate('clientAdminListPage')
+                $this->getService('urlGenerator')->generate('scopeAdminListPage')
             );
             $response->prepare($request);
 
@@ -273,7 +243,7 @@ class ClientController extends RozierApp
 
         $this->assignation['form'] = $form->createView();
 
-        return $this->render('admin/client/delete.html.twig', $this->assignation, null,
+        return $this->render('admin/scope/delete.html.twig', $this->assignation, null,
                              \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
     }
 
@@ -282,12 +252,12 @@ class ClientController extends RozierApp
      *
      * @return \Symfony\Component\Form\Form
      */
-    protected function buildDeleteForm(OAuth2Client $client)
+    protected function buildDeleteForm(OAuth2Scope $scope)
     {
         $builder = $this->getService('formFactory')
             ->createBuilder('form')
-            ->add('clientId', 'hidden', array(
-                'data' => $client->getId(),
+            ->add('scopeId', 'hidden', array(
+                'data' => $scope->getId(),
                 'constraints' => array(
                     new NotBlank()
                 )
