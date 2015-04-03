@@ -1,0 +1,47 @@
+{% extends 'simple.html.twig' %}
+
+{% block content %}
+<section id="login" {% if error %}class="uk-animation-shake"{% endif %}>
+    <div id="login-infos">
+        <div id="login-logo">
+            {% if themeServices.adminImage %}
+                {{ themeServices.adminImage.viewer.getDocumentByArray({width:150})|raw }}
+            {% else %}
+                <i class="uk-icon-rz-roadiz-icon"></i>
+            {% endif %}
+        </div>
+        <div id="login-credit">
+            <i class="uk-icon-rz-rezozero"></i>
+            <span id="login-version">{{ head.cmsVersion }} {{ head.cmsVersionNumber }}</span>
+        </div>
+    </div>
+    <div id="login-formGlobal">
+    	<h1 id="tag-title">{% trans %}Authorize scope{% endtrans %}</h1>
+        {% for scope in scopes %}
+            <table class="content-table uk-table">
+                <thead>
+                    <tr>
+                        <th>{% trans %}name{% endtrans %}</th>
+                        <th>{% trans %}description{% endtrans %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scope in scopes %}
+                    <tr>
+                        <td>{{ scope.name }}</td>
+                        <td>{{ scope.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+       	{% form_theme form 'forms.html.twig' %}
+        <form id="login-form" class="uk-form uk-form-stacked {% if error %}uk-animation-shake{% endif %}" action="{{ path('authorizeScopePage') }}" method="post" {{ form_enctype(form) }}>
+            {{ form_widget(form) }}
+            {{ form_rest(form) }}
+            <!-- {{ form_widget(form.approve) }}
+            {{ form_widget(form.cancel) }} -->
+    	</form>
+    </div>
+</section>
+{% endblock %}

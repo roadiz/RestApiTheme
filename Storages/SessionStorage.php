@@ -28,7 +28,7 @@
  * @author Maxime Constantinian
  */
 
-namespace Themes\RestApiTheme\Storage;
+namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\AuthCodeEntity;
@@ -44,6 +44,8 @@ use Themes\RestApiTheme\Entities\OAuth2Session;
 use Themes\RestApiTheme\Entities\OAuth2ClientSession;
 use Themes\RestApiTheme\Entities\OAuth2UserSession;
 
+use RZ\Roadiz\Core\Kernel;
+
 class SessionStorage extends AbstractStorage implements SessionInterface
 {
     /**
@@ -52,7 +54,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
     public function getByAccessToken(AccessTokenEntity $accessToken)
     {
         $result = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
-                                          ->findByAccessToken($accessToken->getId());
+                                          ->findOneByAccessToken($accessToken->getId());
         if ($result !== null) {
             $session = new SessionEntity($this->server);
             $session->setId($result->getSession()->getId());
@@ -69,7 +71,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
     public function getByAuthCode(AuthCodeEntity $authCode)
     {
         $result = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                                          ->findByAuthCode($authCode->getId());
+                                          ->findOneByAuthCode($authCode->getId());
         if ($result !== null) {
             $session = new SessionEntity($this->server);
             $session->setId($result->getSession()->getId());
@@ -115,10 +117,10 @@ class SessionStorage extends AbstractStorage implements SessionInterface
             $session->setOwner($em->find("RZ\Roadiz\Core\Entities\User", $ownerId));
         }
 
-        $client = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Client")->findByClientId($clientId);
+        $client = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Client")->findOneByClientId($clientId);
         $session->setClient($client);
 
-        $em->persite($session);
+        $em->persist($session);
         $em->flush();
 
         return $session->getId();
@@ -129,8 +131,9 @@ class SessionStorage extends AbstractStorage implements SessionInterface
      */
     public function associateScope(SessionEntity $session, ScopeEntity $scope)
     {
+        $em = Kernel::getService("em");
         $session = Kernel::getService("em")->find("Themes\RestApiTheme\Entities\OAuth2Session", $session->getId());
-        $scope = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")->findByName($scope->getId());
+        $scope = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")->findOneByName($scope->getId());
 
         $session->addScope($scope);
 

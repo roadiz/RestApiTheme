@@ -27,7 +27,7 @@
  * @file OAuth2ClientStorage.php
  * @author Maxime Constantinian
  */
- namespace Themes\RestApiTheme\Stockage;
+ namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\ClientEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
@@ -35,6 +35,8 @@ use League\OAuth2\Server\Storage\AbstractStorage;
 use League\OAuth2\Server\Storage\ClientInterface;
 
 use Themes\RestApiTheme\Entities\OAuth2Client;
+
+use RZ\Roadiz\Core\Kernel;
 
 class ClientStorage extends AbstractStorage implements ClientInterface
 {
@@ -55,8 +57,7 @@ class ClientStorage extends AbstractStorage implements ClientInterface
         }
 
         $result = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Client")
-                     ->findBy($queryArray);
-
+                     ->findOneBy($queryArray);
         if ($result !== null) {
             $client = new ClientEntity($this->server);
             $client->hydrate([

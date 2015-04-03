@@ -28,12 +28,14 @@
  * @author Maxime Constantinian
  */
 
-namespace Themes\RestApiTheme\Storage;
+namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AbstractStorage;
 use League\OAuth2\Server\Storage\ScopeInterface;
 use Themes\RestApiTheme\Entities\OAuth2Scope;
+
+use RZ\Roadiz\Core\Kernel;
 
 class ScopeStorage extends AbstractStorage implements ScopeInterface
 {
@@ -45,7 +47,7 @@ class ScopeStorage extends AbstractStorage implements ScopeInterface
         $em = Kernel::getService('em');
 
         $result = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")
-                     ->findByName($scope);
+                     ->findOneByName($scope);
 
         if ($result !== null) {
             return (new ScopeEntity($this->server))->hydrate([

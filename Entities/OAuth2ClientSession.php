@@ -38,7 +38,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="RZ\Roadiz\Core\Repositories\EntityRepository")
  * @ORM\Table(name="oauth_session_client")
  */
-abstract class OAuth2ClientSession extends OAuth2Session
+class OAuth2ClientSession extends OAuth2Session
 {
     /**
      * @ORM\ManyToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Client")

@@ -30,10 +30,12 @@
 
 namespace Themes\RestApiTheme\Controllers;
 
-use Themes\RestApiTheme\RestApiTheme;
-use Themes\RestApiTheme\Storage;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ApiController extends RestApiTheme
+use Themes\RestApiTheme\RestApiThemeApp;
+use Themes\RestApiTheme\Storages;
+
+class ApiController extends RestApiThemeApp
 {
     protected $server;
     protected $authCodeGrant;
@@ -41,17 +43,27 @@ class ApiController extends RestApiTheme
 
     public function prepareApiServer() {
         // Set up the OAuth 2.0 authorization server
-        $server = new \League\OAuth2\Server\AuthorizationServer();
-        $server->setSessionStorage(new Storage\SessionStorage());
-        $server->setAccessTokenStorage(new Storage\AccessTokenStorage());
-        $server->setRefreshTokenStorage(new Storage\RefreshTokenStorage());
-        $server->setClientStorage(new Storage\ClientStorage());
-        $server->setScopeStorage(new Storage\ScopeStorage());
-        $server->setAuthCodeStorage(new Storage\AuthCodeStorage());
+        $this->server = new \League\OAuth2\Server\AuthorizationServer();
+        $this->server->setSessionStorage(new Storages\SessionStorage());
+        $this->server->setAccessTokenStorage(new Storages\AccessTokenStorage());
+        $this->server->setRefreshTokenStorage(new Storages\RefreshTokenStorage());
+        $this->server->setClientStorage(new Storages\ClientStorage());
+        $this->server->setScopeStorage(new Storages\ScopeStorage());
+        $this->server->setAuthCodeStorage(new Storages\AuthCodeStorage());
 
-        $authCodeGrant = new \League\OAuth2\Server\Grant\AuthCodeGrant();
-        $server->addGrantType($authCodeGrant);
-        $refrehTokenGrant = new \League\OAuth2\Server\Grant\RefreshTokenGrant();
-        $server->addGrantType($refrehTokenGrant);
+        $this->authCodeGrant = new \League\OAuth2\Server\Grant\AuthCodeGrant();
+        $this->server->addGrantType($this->authCodeGrant);
+        $this->refrehTokenGrant = new \League\OAuth2\Server\Grant\RefreshTokenGrant();
+        $this->server->addGrantType($this->refrehTokenGrant);
+    }
+
+
+
+    public function sendJson($statusCode, $data) {
+        $response = new JsonResponse();
+        $response->setData($data);
+        $response->setStatusCode($statusCode);
+
+        return $response;
     }
 }

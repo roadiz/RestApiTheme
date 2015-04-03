@@ -28,13 +28,15 @@
  * @author Maxime Constantinian
  */
 
-namespace Themes\RestApiTheme\Storage;
+namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AbstractStorage;
 use League\OAuth2\Server\Storage\AccessTokenInterface;
 use Themes\RestApiTheme\Entities\OAuth2AccessToken;
+
+use RZ\Roadiz\Core\Kernel;
 
 class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
 {
@@ -48,7 +50,7 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
         if ($result !== null) {
             $token = (new AccessTokenEntity($this->server))
                         ->setId($result->getAccessToken())
-                        ->setExpireTime($result->getExpireTime());
+                        ->setExpireTime($result->getExpireTime()->getTimestamp());
             return $token;
         }
         return;
@@ -82,14 +84,15 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
     {
         $em = Kernel::getService("em");
 
-        $session = $em->find("Themes/Entities/OAuth2Session", $sessionId);
+        $session = $em->find("Themes\RestApiTheme\Entities\OAuth2Session", $sessionId);
 
         $accessToken = new OAuth2AccessToken();
         $accessToken->setAccessToken($token);
-        $accessToken->setExpireTime($expireTime);
+        $datetime = new \DateTime();
+        $accessToken->setExpireTime($datetime->setTimestamp($expireTime));
         $accessToken->setSession($session);
 
-        $em->persist($accesToken);
+        $em->persist($accessToken);
         $em->flush();
     }
 
@@ -119,7 +122,7 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
 
         $accessToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
                                                ->findOneByAccessToken($token->getId());
-        $em->remove($accssToken);
+        $em->remove($accessToken);
         $em->flush();
     }
 }

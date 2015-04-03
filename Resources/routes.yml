@@ -4,3 +4,19 @@ defaultRemoveTrailingSlash:
     requirements:
         url: .*/$
     methods: [GET]
+
+authorizeApiPage:
+    path: /oauth
+    defaults: { _controller: Themes\RestApiTheme\Controllers\AuthController::oauthAction}
+
+signInPage:
+    path: /signin
+    defaults: { _controller: Themes\RestApiTheme\Controllers\ApiLoginController::indexAction}
+
+authorizeScopePage:
+    path: /authorize
+    defaults: { _controller: Themes\RestApiTheme\Controllers\AuthController::authorizeAction}
+
+accessTokenPage:
+    path: /access_token
+    defaults: { _controller: Themes\RestApiTheme\Controllers\AuthController::accessTokenAction}

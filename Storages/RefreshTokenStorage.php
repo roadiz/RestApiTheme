@@ -28,13 +28,15 @@
  * @author Maxime Constantinian
  */
 
-namespace Themes\RestApiTheme\Storage;
+namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\RefreshTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AbstractStorage;
 use League\OAuth2\Server\Storage\RefreshTokenInterface;
 use Themes\RestApiTheme\Entities\OAuth2RefreshToken;
+
+use RZ\Roadiz\Core\Kernel;
 
 class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterface
 {
@@ -49,7 +51,7 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
             $token = (new RefreshTokenEntity($this->server))
                         ->setId($result->getRefreshToken())
                         ->setAccessTokenId($result->getAccessToken()->getAccessToken())
-                        ->setExpireTime($result->getExpireTime());
+                        ->setExpireTime($result->getExpireTime()->getTimestamp());
             return $token;
         }
         return;
@@ -58,18 +60,16 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
     /**
      * {@inheritdoc}
      */
-    public function create($token, $expireTime, $sessionId, $accessToken)
+    public function create($token, $expireTime, $accessToke)
     {
         $em = Kernel::getService("em");
 
-        $session = $em->find("Themes/Entities/OAuth2Session", $sessionId);
-
-        $accessToken = $em->getRepository()->findByAccessToken("Themes/Entities/OAuth2Session", $accessToken);
+        $accessToken = $em->getRepository()->findOneByAccessToken("Themes\RestApiTheme\Entities\OAuth2Session", $accessToken);
 
         $refreshToken = new OAuth2RefreshToken();
         $refreshToken->setRefreshToken($token);
-        $refreshToken->setExpireTime($expireTime);
-        $refreshToken->setSession($session);
+        $datetime = new \DateTime();
+        $refreshToken->setExpireTime($datetime->setTimestamp($expireTime));
         $refreshToken->setAccessToken($accessToken);
 
         $em->persist($refreshToken);
