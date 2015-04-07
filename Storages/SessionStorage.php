@@ -109,18 +109,34 @@ class SessionStorage extends AbstractStorage implements SessionInterface
     {
         $em = Kernel::getService("em");
 
+                $client = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Client")->findOneByClientId($clientId);
+
         if ($ownerType == "client") {
-            $session = new OAuth2ClientSession();
-            $session->setOwner($em->find("Themes\RestApiTheme\Entities\OAuth2Client", $ownerId));
+            $owner = $em->find("Themes\RestApiTheme\Entities\OAuth2Client", $ownerId);
+            $session = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Session")
+                          ->findOneBy(['owner' => $owner, 'client' => $client]);
+
+            if ($session === null) {
+                $session = new OAuth2ClientSession();
+                $em->persist($session);
+            }
+
+
         } else {
-            $session = new OAuth2UserSession();
-            $session->setOwner($em->find("RZ\Roadiz\Core\Entities\User", $ownerId));
+            $owner = $em->find("RZ\Roadiz\Core\Entities\User", $ownerId);
+            $session = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2UserSession")
+                          ->findOneBy(['owner' => $owner, 'client' => $client]);
+
+            if ($session === null) {
+                $session = new OAuth2UserSession();
+                $em->persist($session);
+            }
+
         }
 
-        $client = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Client")->findOneByClientId($clientId);
+        $session->setOwner($owner);
         $session->setClient($client);
 
-        $em->persist($session);
         $em->flush();
 
         return $session->getId();

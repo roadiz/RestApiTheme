@@ -66,6 +66,29 @@ class OAuth2AccessToken extends AbstractEntity
         return $this;
     }
 
+     /**
+      * @ORM\OneToOne(targetEntity="OAuth2RefreshToken", inversedBy="accessToken")
+      * @ORM\JoinColumn(name="refresh_token_id", referencedColumnName="id", onDelete="CASCADE")
+      **/
+     private $refreshToken;
+
+     /**
+      * @return Themes\RestApiTheme\Entities\OAuth2RefreshToken
+      */
+     public function getRefreshToken() {
+         return $this->refreshToken;
+     }
+
+     /**
+      * @param Themes\RestApiTheme\Entities\OAuth2RefreshToken $refreshToken
+      *
+      * @return $this
+      */
+      public function setRefreshToken($refreshToken) {
+          $this->refreshToken = $refreshToken;
+          return $this;
+      }
+
     /**
      * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Session")
      * @ORM\JoinColumn(name="session_id", referencedColumnName="id", onDelete="CASCADE")
@@ -137,5 +160,9 @@ class OAuth2AccessToken extends AbstractEntity
 
      public function __construct() {
          $this->scopes = new ArrayCollection;
+     }
+
+     public function __toString() {
+         return 'OAuth2AccessToken: id = ' . $this->getId() . ', value = ' . $this->getAccessToken(); 
      }
 }

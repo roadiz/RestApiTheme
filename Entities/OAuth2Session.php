@@ -68,7 +68,7 @@ abstract class OAuth2Session extends AbstractEntity
          }
 
          /**
-          * @param Themes\RestApiTheme\Entities\OAuth2Client $clientId
+          * @param Themes\RestApiTheme\Entities\OAuth2Client $client
           *
           * @return $this
           */

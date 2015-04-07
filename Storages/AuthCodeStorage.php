@@ -65,13 +65,20 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
 
         $session = $em->find("Themes\RestApiTheme\Entities\OAuth2Session", $sessionId);
 
-        $authCode = new OAuth2AuthCode();
+        $authCode = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")->findOneBySession($session);
+
+        if ($authCode === null) {
+            $authCode = new OAuth2AuthCode();
+
+            $em->persist($authCode);
+        }
+
+
         $authCode->setAuthCode($token);
         $authCode->setSession($session);
         $datetime = new \DateTime();
         $authCode->setExpireTime($datetime->setTimestamp($expireTime));
 
-        $em->persist($authCode);
         $em->flush();
     }
 

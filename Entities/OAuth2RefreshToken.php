@@ -65,10 +65,9 @@ class OAuth2RefreshToken extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @ORM\OneToOne(targetEntity="OAuth2AccessToken")
-     * @ORM\JoinColumn(name="access_token_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
+     /**
+      * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2AccessToken", mappedBy="refreshToken")
+      **/
      private $accessToken;
 
      /**

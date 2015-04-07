@@ -155,10 +155,10 @@ class AuthController extends ApiController
 
         $this->prepareApiServer();
 
-        // try {
+        //try {
             $response = $this->server->issueAccessToken();
             return $this->sendJson(200, $response);
-        //
+
         // } catch (\Exception $e) {
         //     return $this->sendJson($e->httpStatusCode, [
         //         'error'     =>  $e->errorType,

@@ -50,8 +50,10 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
         if ($result !== null) {
             $token = (new RefreshTokenEntity($this->server))
                         ->setId($result->getRefreshToken())
-                        ->setAccessTokenId($result->getAccessToken()->getAccessToken())
                         ->setExpireTime($result->getExpireTime()->getTimestamp());
+            if ($result->getAccessToken() !== null) {
+                $token->setAccessTokenId($result->getAccessToken()->getAccessToken());
+            }
             return $token;
         }
         return;
@@ -66,14 +68,23 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
 
         $accessToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")->findOneByAccessToken($accessToken);
 
-        $refreshToken = new OAuth2RefreshToken();
+        $refreshToken = $accessToken->getRefreshToken();
+
+        if ($refreshToken === null) {
+            $refreshToken = new OAuth2RefreshToken();
+            $em->persist($refreshToken);
+        }
+
         $refreshToken->setRefreshToken($token);
         $datetime = new \DateTime();
         $refreshToken->setExpireTime($datetime->setTimestamp($expireTime));
         $refreshToken->setAccessToken($accessToken);
 
-        $em->persist($refreshToken);
         $em->flush();
+        var_dump("RefreshToken flush Finish");
+        $accessToken->setRefreshToken($refreshToken);
+        $em->flush();
+        var_dump("AccessToken Set Flush Finish");
     }
 
     /**

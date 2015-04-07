@@ -53,8 +53,8 @@ class ApiController extends RestApiThemeApp
 
         $this->authCodeGrant = new \League\OAuth2\Server\Grant\AuthCodeGrant();
         $this->server->addGrantType($this->authCodeGrant);
-        $this->refrehTokenGrant = new \League\OAuth2\Server\Grant\RefreshTokenGrant();
-        $this->server->addGrantType($this->refrehTokenGrant);
+        $this->refreshTokenGrant = new \League\OAuth2\Server\Grant\RefreshTokenGrant();
+        $this->server->addGrantType($this->refreshTokenGrant);
     }
 
 

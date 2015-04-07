@@ -86,14 +86,21 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
 
         $session = $em->find("Themes\RestApiTheme\Entities\OAuth2Session", $sessionId);
 
-        $accessToken = new OAuth2AccessToken();
+        $accessToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")->findOneBySession($session);
+
+        if ($accessToken === null) {
+            $accessToken = new OAuth2AccessToken();
+            $em->persist($accessToken);
+        }
+
+
         $accessToken->setAccessToken($token);
         $datetime = new \DateTime();
         $accessToken->setExpireTime($datetime->setTimestamp($expireTime));
         $accessToken->setSession($session);
 
-        $em->persist($accessToken);
         $em->flush();
+        var_dump("AccessToken Create Finish");
     }
 
     /**
