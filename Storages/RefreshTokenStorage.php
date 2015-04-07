@@ -81,10 +81,9 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
         $refreshToken->setAccessToken($accessToken);
 
         $em->flush();
-        var_dump("RefreshToken flush Finish");
+
         $accessToken->setRefreshToken($refreshToken);
         $em->flush();
-        var_dump("AccessToken Set Flush Finish");
     }
 
     /**

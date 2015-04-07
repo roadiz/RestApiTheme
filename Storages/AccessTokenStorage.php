@@ -100,7 +100,6 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
         $accessToken->setSession($session);
 
         $em->flush();
-        var_dump("AccessToken Create Finish");
     }
 
     /**
