@@ -46,13 +46,13 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
     public function get($token)
     {
         $result = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2RefreshToken")
-                                          ->findOneByRefreshToken($token);
+                                          ->findOneByValue($token);
         if ($result !== null) {
             $token = (new RefreshTokenEntity($this->server))
-                        ->setId($result->getRefreshToken())
+                        ->setId($result->getValue())
                         ->setExpireTime($result->getExpireTime()->getTimestamp());
             if ($result->getAccessToken() !== null) {
-                $token->setAccessTokenId($result->getAccessToken()->getAccessToken());
+                $token->setAccessTokenId($result->getAccessToken()->getValue());
             }
             return $token;
         }
@@ -66,7 +66,8 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
     {
         $em = Kernel::getService("em");
 
-        $accessToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")->findOneByAccessToken($accessToken);
+        $accessToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
+                          ->findOneByValue($accessToken);
 
         $refreshToken = $accessToken->getRefreshToken();
 
@@ -75,7 +76,7 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
             $em->persist($refreshToken);
         }
 
-        $refreshToken->setRefreshToken($token);
+        $refreshToken->setValue($token);
         $datetime = new \DateTime();
         $refreshToken->setExpireTime($datetime->setTimestamp($expireTime));
         $refreshToken->setAccessToken($accessToken);
@@ -94,7 +95,7 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
         $em = Kernel::getService("em");
 
         $refreshToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2RefreshToken")
-                                               ->findOneByRefreshToken($token->getId());
+                           ->findOneByValue($token->getId());
         $em->remove($refreshToken);
         $em->flush();
     }

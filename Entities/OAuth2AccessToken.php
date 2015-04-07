@@ -27,13 +27,13 @@
  * @file OAuth2AccessToken.php
  * @author Maxime Constantinian
  */
- namespace Themes\RestApiTheme\Entities;
+namespace Themes\RestApiTheme\Entities;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
-use Themes\RestApiTheme\Entities\OAuth2Session;
+use Themes\RestApiTheme\AbstractEntities\AbstractValuedEntity;
 use Themes\RestApiTheme\Entities\OAuth2Scope;
+use Themes\RestApiTheme\Entities\OAuth2Session;
 
 /**
  * OAuth2AccessToken store all information about access token.
@@ -41,128 +41,115 @@ use Themes\RestApiTheme\Entities\OAuth2Scope;
  * @ORM\Entity(repositoryClass="RZ\Roadiz\Core\Repositories\EntityRepository")
  * @ORM\Table(name="oauth_access_token")
  */
-class OAuth2AccessToken extends AbstractEntity
+class OAuth2AccessToken extends AbstractValuedEntity
 {
     /**
-     * @ORM\Column(type="string", nullable=false)
-     * @var string
-     */
-    private $accessToken;
+     * @ORM\OneToOne(targetEntity="OAuth2RefreshToken", inversedBy="accessToken")
+     * @ORM\JoinColumn(name="refresh_token_id", referencedColumnName="id", onDelete="CASCADE")
+     **/
+    private $refreshToken;
 
     /**
-     * @return string
+     * @return Themes\RestApiTheme\Entities\OAuth2RefreshToken
      */
-    public function getAccessToken() {
-        return $this->accessToken;
+    public function getRefreshToken()
+    {
+        return $this->refreshToken;
     }
 
     /**
-     * @param string $accessToken
+     * @param Themes\RestApiTheme\Entities\OAuth2RefreshToken $refreshToken
      *
      * @return $this
      */
-    public function setAccessToken($accessToken) {
-        $this->accessToken = $accessToken;
+    public function setRefreshToken($refreshToken)
+    {
+        $this->refreshToken = $refreshToken;
         return $this;
     }
-
-     /**
-      * @ORM\OneToOne(targetEntity="OAuth2RefreshToken", inversedBy="accessToken")
-      * @ORM\JoinColumn(name="refresh_token_id", referencedColumnName="id", onDelete="CASCADE")
-      **/
-     private $refreshToken;
-
-     /**
-      * @return Themes\RestApiTheme\Entities\OAuth2RefreshToken
-      */
-     public function getRefreshToken() {
-         return $this->refreshToken;
-     }
-
-     /**
-      * @param Themes\RestApiTheme\Entities\OAuth2RefreshToken $refreshToken
-      *
-      * @return $this
-      */
-      public function setRefreshToken($refreshToken) {
-          $this->refreshToken = $refreshToken;
-          return $this;
-      }
 
     /**
      * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Session")
      * @ORM\JoinColumn(name="session_id", referencedColumnName="id", onDelete="CASCADE")
      **/
-     private $session;
+    private $session;
 
-     /**
-      * @return Themes\RestApiTheme\Entities\OAuth2Session
-      */
-     public function getSession() {
-         return $this->session;
-     }
+    /**
+     * @return Themes\RestApiTheme\Entities\OAuth2Session
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
 
-     /**
-      * @param Themes\RestApiTheme\Entities\OAuth2Session $session
-      *
-      * @return $this
-      */
-      public function setSession($session) {
-          $this->session = $session;
-          return $this;
-      }
+    /**
+     * @param Themes\RestApiTheme\Entities\OAuth2Session $session
+     *
+     * @return $this
+     */
+    public function setSession($session)
+    {
+        $this->session = $session;
+        return $this;
+    }
 
-      /**
-       * @ORM\Column(type="datetime", nullable=false)
-       * @var DateTime
-       */
-      private $expireTime;
+    /**
+     * @ORM\Column(name="expire_time", type="datetime", nullable=false)
+     * @var DateTime
+     */
+    private $expireTime;
 
-      /**
-       * @return DateTime
-       */
-      public function getExpireTime() {
-          return $this->expireTime;
-      }
+    /**
+     * @return DateTime
+     */
+    public function getExpireTime()
+    {
+        return $this->expireTime;
+    }
 
-      /**
-       * @param DateTime $expireTime
-       *
-       * @return $this
-       */
-      public function setExpireTime($expireTime) {
-          $this->expireTime = $expireTime;
-          return $this;
-      }
+    /**
+     * @param DateTime $expireTime
+     *
+     * @return $this
+     */
+    public function setExpireTime($expireTime)
+    {
+        $this->expireTime = $expireTime;
+        return $this;
+    }
 
     /**
      * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="accessTokens")
      * @var ArrayCollection
      **/
-     private $scopes;
+    private $scopes;
 
-     /**
-      * @return ArrayCollection
-      */
-     public function getScopes() {
-         return $this->scopes;
-     }
+    /**
+     * @return ArrayCollection
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
+    }
 
-     /**
-      * @param OAuth2Scope $scope
-      *
-      * @return $this
-      */
-     public function addScope($scope) {
-         $this->scopes->add($scope);
-         return $this;
-     }
+    /**
+     * @param OAuth2Scope $scope
+     *
+     * @return $this
+     */
+    public function addScope($scope)
+    {
+        $this->scopes->add($scope);
+        return $this;
+    }
 
-     public function __construct() {
-         $this->scopes = new ArrayCollection;
-     }
+    public function __construct()
+    {
+        $this->scopes = new ArrayCollection;
+    }
 
-     public function __toString() {
-         return 'OAuth2AccessToken: id = ' . $this->getId() . ', value = ' . $this->getAccessToken(); 
-     }
+    public function __toString()
+    {
+        return 'OAuth2AccessToken: id = ' . $this->getId() . ', value = ' . $this->getValue();
+    }
 }

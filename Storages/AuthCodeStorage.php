@@ -45,14 +45,14 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
      */
     public function get($code)
     {
-        $q = Kernel::getService("em")->createQuery("SELECT a FROM Themes\RestApiTheme\Entities\OAuth2AuthCode a WHERE a.expireTime >= ?1 AND a.authCode = ?2");
-        $q->setParameter(1, new \DateTime());
-        $q->setParameter(2, $code);
-        $result = $q->getResult()[0];
+        $q = Kernel::getService("em")->createQuery("SELECT a FROM Themes\RestApiTheme\Entities\OAuth2AuthCode a WHERE a.expireTime >= :expireTime AND a.value = :value");
+        $q->setParameter('expireTime', new \DateTime());
+        $q->setParameter('value', $code);
+        $result = $q->getSingleResult();
 
         if ($result !== null) {
             $token = (new AuthCodeEntity($this->server))
-                        ->setId($result->getAuthCode())
+                        ->setId($result->getValue())
                         ->setRedirectUri($result->getSession()->getClient()->getRedirectUri())
                         ->setExpireTime($result->getExpireTime()->getTimestamp());
             return $token;
@@ -74,7 +74,7 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
         }
 
 
-        $authCode->setAuthCode($token);
+        $authCode->setValue($token);
         $authCode->setSession($session);
         $datetime = new \DateTime();
         $authCode->setExpireTime($datetime->setTimestamp($expireTime));
@@ -88,7 +88,7 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
     public function getScopes(AuthCodeEntity $token)
     {
         $authCode = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                                               ->findOneByAuthCode($token->getId());
+                                               ->findOneByValue($token->getId());
 
         $response = [];
         if ($authCode->getScopes()->count() > 0) {
@@ -111,7 +111,7 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
         $em = Kernel::getService("em");
 
         $authCode = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                       ->findOneByAuthCode($token->getId());
+                       ->findOneByValue($token->getId());
         $scope = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")
                     ->findOneByName($scope->getId());
         $authCode->addScope($scope);
@@ -127,7 +127,7 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
         $em = Kernel::getService("em");
 
         $authCode = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                          ->findOneByAuthCode($token->getId());
+                          ->findOneByValue($token->getId());
         $em->remove($authCode);
         $em->flush();
     }

@@ -52,55 +52,60 @@ use Themes\RestApiTheme\Entities\OAuth2Scope;
 abstract class OAuth2Session extends AbstractEntity
 {
 
-       abstract public function getOwner();
+    abstract public function getOwner();
 
-        /**
-         * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Client")
-         * @ORM\JoinColumn(name="client_id", referencedColumnName="id", onDelete="CASCADE")
-         **/
-         private $client;
+    /**
+     * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Client")
+     * @ORM\JoinColumn(name="client_id", referencedColumnName="id", onDelete="CASCADE")
+     **/
+    private $client;
 
-         /**
-          * @return Themes\RestApiTheme\Entities\OAuth2Client
-          */
-         public function getClient() {
-             return $this->client;
-         }
+    /**
+     * @return Themes\RestApiTheme\Entities\OAuth2Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
 
-         /**
-          * @param Themes\RestApiTheme\Entities\OAuth2Client $client
-          *
-          * @return $this
-          */
-          public function setClient($client) {
-              $this->client = $client;
-              return $this;
-          }
+    /**
+     * @param Themes\RestApiTheme\Entities\OAuth2Client $client
+     *
+     * @return $this
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
+        return $this;
+    }
 
-          /**
-           * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="sessions")
-           * @var ArrayCollection
-           **/
-           private $scopes;
+    /**
+     * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="sessions")
+     * @var ArrayCollection
+     **/
+    private $scopes;
 
-           /**
-            * @return ArrayCollection
-            */
-           public function getScopes() {
-               return $this->scopes;
-           }
+    /**
+     * @return ArrayCollection
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
+    }
 
-           /**
-            * @param OAuth2Scope $scope
-            *
-            * @return $this
-            */
-           public function addScope($scope) {
-               $this->scopes->add($scope);
-               return $this;
-           }
+    /**
+     * @param OAuth2Scope $scope
+     *
+     * @return $this
+     */
+    public function addScope($scope)
+    {
+        $this->scopes->add($scope);
+        return $this;
+    }
 
-           public function __construct() {
-               $this->scopes = new ArrayCollection;
-           }
+    public function __construct()
+    {
+        $this->scopes = new ArrayCollection;
+    }
 }

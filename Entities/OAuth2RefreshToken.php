@@ -27,11 +27,10 @@
  * @file OAuth2RefreshToken.php
  * @author Maxime Constantinian
  */
- namespace Themes\RestApiTheme\Entities;
+namespace Themes\RestApiTheme\Entities;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
+use Themes\RestApiTheme\AbstractEntities\AbstractValuedEntity;
 use Themes\RestApiTheme\Entities\OAuth2AccessToken;
 
 /**
@@ -40,74 +39,60 @@ use Themes\RestApiTheme\Entities\OAuth2AccessToken;
  * @ORM\Entity(repositoryClass="RZ\Roadiz\Core\Repositories\EntityRepository")
  * @ORM\Table(name="oauth_refresh_token")
  */
-class OAuth2RefreshToken extends AbstractEntity
+class OAuth2RefreshToken extends AbstractValuedEntity
 {
     /**
-     * @ORM\Column(type="string", nullable=false)
-     * @var string
-     */
-    private $refreshToken;
+     * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2AccessToken", mappedBy="refreshToken")
+     **/
+    private $accessToken;
 
     /**
-     * @return string
+     * @return Themes\RestApiTheme\Entities\OAuth2AccessToken
      */
-    public function getRefreshToken() {
-        return $this->refreshToken;
+    public function getAccessToken()
+    {
+        return $this->accessToken;
     }
 
     /**
-     * @param string $refreshToken
+     * @param Themes\RestApiTheme\Entities\OAuth2AccessToken $accessToken
      *
      * @return $this
      */
-    public function setRefreshToken($refreshToken) {
-        $this->refreshToken = $refreshToken;
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
         return $this;
     }
 
-     /**
-      * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2AccessToken", mappedBy="refreshToken")
-      **/
-     private $accessToken;
+    /**
+     * @ORM\Column(name="expire_time", type="datetime", nullable=false)
+     * @var DateTime
+     */
+    private $expireTime;
 
-     /**
-      * @return Themes\RestApiTheme\Entities\OAuth2AccessToken
-      */
-     public function getAccessToken() {
-         return $this->accessToken;
-     }
+    /**
+     * @return DateTime
+     */
+    public function getExpireTime()
+    {
+        return $this->expireTime;
+    }
 
-     /**
-      * @param Themes\RestApiTheme\Entities\OAuth2AccessToken $accessToken
-      *
-      * @return $this
-      */
-      public function setAccessToken($accessToken) {
-          $this->accessToken = $accessToken;
-          return $this;
-      }
+    /**
+     * @param DateTime $expireTime
+     *
+     * @return $this
+     */
+    public function setExpireTime($expireTime)
+    {
+        $this->expireTime = $expireTime;
+        return $this;
+    }
 
-      /**
-       * @ORM\Column(type="datetime", nullable=false)
-       * @var DateTime
-       */
-      private $expireTime;
-
-      /**
-       * @return DateTime
-       */
-      public function getExpireTime() {
-          return $this->expireTime;
-      }
-
-      /**
-       * @param DateTime $expireTime
-       *
-       * @return $this
-       */
-      public function setExpireTime($expireTime) {
-          $this->expireTime = $expireTime;
-          return $this;
-      }
+    public function __toString()
+    {
+        return 'OAuth2RefreshToken: id = ' . $this->getId() . ', value = ' . $this->getValue();
+    }
 
 }

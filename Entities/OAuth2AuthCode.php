@@ -27,13 +27,13 @@
  * @file OAuth2AuthCode.php
  * @author Maxime Constantinian
  */
- namespace Themes\RestApiTheme\Entities;
+namespace Themes\RestApiTheme\Entities;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
-use Themes\RestApiTheme\Entities\OAuth2Session;
+use Themes\RestApiTheme\AbstractEntities\AbstractValuedEntity;
 use Themes\RestApiTheme\Entities\OAuth2Scope;
+use Themes\RestApiTheme\Entities\OAuth2Session;
 
 /**
  * OAuth2AuthCode store all information about auth code.
@@ -41,101 +41,90 @@ use Themes\RestApiTheme\Entities\OAuth2Scope;
  * @ORM\Entity(repositoryClass="RZ\Roadiz\Core\Repositories\EntityRepository")
  * @ORM\Table(name="oauth_auth_code")
  */
-class OAuth2AuthCode extends AbstractEntity
+class OAuth2AuthCode extends AbstractValuedEntity
 {
-    /**
-     * @ORM\Column(type="string", nullable=false)
-     * @var string
-     */
-    private $authCode;
-
-    /**
-     * @return string
-     */
-    public function getAuthCode() {
-        return $this->authCode;
-    }
-
-    /**
-     * @param string $authCode
-     *
-     * @return $this
-     */
-    public function setAuthCode($authCode) {
-        $this->authCode = $authCode;
-        return $this;
-    }
-
     /**
      * @ORM\ManyToOne(targetEntity="OAuth2Session")
      * @ORM\JoinColumn(name="session_id", referencedColumnName="id", onDelete="CASCADE")
      **/
-     private $session;
+    private $session;
 
-     /**
-      * @return Themes\RestApiTheme\Entities\OAuth2Session
-      */
-     public function getSession() {
-         return $this->session;
-     }
+    /**
+     * @return Themes\RestApiTheme\Entities\OAuth2Session
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
 
-     /**
-      * @param Themes\RestApiTheme\Entities\OAuth2Session $session
-      *
-      * @return $this
-      */
-      public function setSession($session) {
-          $this->session = $session;
-          return $this;
-      }
+    /**
+     * @param Themes\RestApiTheme\Entities\OAuth2Session $session
+     *
+     * @return $this
+     */
+    public function setSession($session)
+    {
+        $this->session = $session;
+        return $this;
+    }
 
-      /**
-       * @ORM\Column(type="datetime", nullable=false)
-       * @var DateTime
-       */
-      private $expireTime;
+    /**
+     * @ORM\Column(type="datetime", nullable=false)
+     * @var DateTime
+     */
+    private $expireTime;
 
-      /**
-       * @return DateTime
-       */
-      public function getExpireTime() {
-          return $this->expireTime;
-      }
+    /**
+     * @return DateTime
+     */
+    public function getExpireTime()
+    {
+        return $this->expireTime;
+    }
 
-      /**
-       * @param DateTime $expireTime
-       *
-       * @return $this
-       */
-      public function setExpireTime($expireTime) {
-          $this->expireTime = $expireTime;
-          return $this;
-      }
+    /**
+     * @param DateTime $expireTime
+     *
+     * @return $this
+     */
+    public function setExpireTime($expireTime)
+    {
+        $this->expireTime = $expireTime;
+        return $this;
+    }
 
-      /**
-       * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="authCodes")
-       * @var ArrayCollection
-       **/
-       private $scopes;
+    /**
+     * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="authCodes")
+     * @var ArrayCollection
+     **/
+    private $scopes;
 
-       /**
-        * @return ArrayCollection
-        */
-       public function getScopes() {
-           return $this->scopes;
-       }
+    /**
+     * @return ArrayCollection
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
+    }
 
-       /**
-        * @param OAuth2Scope $scope
-        *
-        * @return $this
-        */
-       public function addScope($scope) {
-           $this->scopes->add($scope);
-           return $this;
-       }
+    /**
+     * @param OAuth2Scope $scope
+     *
+     * @return $this
+     */
+    public function addScope($scope)
+    {
+        $this->scopes->add($scope);
+        return $this;
+    }
 
-       public function __construct() {
-           $this->scopes = new ArrayCollection;
-       }
+    public function __construct()
+    {
+        $this->scopes = new ArrayCollection;
+    }
+
+    public function __toString()
+    {
+        return 'OAuth2AuthCode: id = ' . $this->getId() . ', value = ' . $this->getValue();
+    }
 }

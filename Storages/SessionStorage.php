@@ -54,7 +54,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
     public function getByAccessToken(AccessTokenEntity $accessToken)
     {
         $result = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
-                                          ->findOneByAccessToken($accessToken->getId());
+                                          ->findOneByValue($accessToken->getId());
         if ($result !== null) {
             $session = new SessionEntity($this->server);
             $session->setId($result->getSession()->getId());
@@ -71,7 +71,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
     public function getByAuthCode(AuthCodeEntity $authCode)
     {
         $result = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                                          ->findOneByAuthCode($authCode->getId());
+                                          ->findOneByValue($authCode->getId());
         if ($result !== null) {
             $session = new SessionEntity($this->server);
             $session->setId($result->getSession()->getId());

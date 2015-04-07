@@ -27,14 +27,14 @@
  * @file OAuth2Scope.php
  * @author Maxime Constantinian
  */
- namespace Themes\RestApiTheme\Entities;
+namespace Themes\RestApiTheme\Entities;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
-use Themes\RestApiTheme\Entities\OAuth2Session;
 use Themes\RestApiTheme\Entities\OAuth2AccessToken;
 use Themes\RestApiTheme\Entities\OAuth2AuthCode;
+use Themes\RestApiTheme\Entities\OAuth2Session;
 
 /**
  * OAuth2Scope store all information about OAuth2 scope.
@@ -48,123 +48,134 @@ class OAuth2Scope extends AbstractEntity
      * @ORM\Column(type="string", nullable=false)
      * @var string
      */
-     private $name;
+    private $name;
 
-     /**
-      * @return string
-      */
-     public function getName() {
-         return $this->name;
-     }
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-     /**
-      * @param string $name
-      *
-      * @return $this
-      */
-      public function setName($name) {
-          $this->name = $name;
-          return $this;
-      }
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-      /**
-       * @ORM\Column(type="string", nullable=true)
-       * @var string
-       */
-       private $description;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string
+     */
+    private $description;
 
-       /**
-        * @return string
-        */
-       public function getDescription() {
-           return $this->description;
-       }
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
 
-       /**
-        * @param string $name
-        *
-        * @return $this
-        */
-        public function setDescription($description) {
-            $this->description = $description;
-            return $this;
-        }
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
 
-        /**
-         * @ORM\ManyToMany(targetEntity="OAuth2AccessToken", inversedBy="scopes")
-         * @ORM\JoinTable(name="oauth_access_token_scope")
-         * @var ArrayCollection
-         **/
-         private $accessTokens;
+    /**
+     * @ORM\ManyToMany(targetEntity="OAuth2AccessToken", inversedBy="scopes")
+     * @ORM\JoinTable(name="oauth_access_token_scope")
+     * @var ArrayCollection
+     **/
+    private $accessTokens;
 
-         /**
-          * @return ArrayCollection
-          */
-         public function getAccessTokens() {
-             return $this->accessTokens;
-         }
+    /**
+     * @return ArrayCollection
+     */
+    public function getAccessTokens()
+    {
+        return $this->accessTokens;
+    }
 
-         /**
-          * @param OAuth2AccessToken $scope
-          *
-          * @return $this
-          */
-         public function addAccessToken($accessToken) {
-             $this->accessTokens->add($accessToken);
-             return $this;
-         }
+    /**
+     * @param OAuth2AccessToken $scope
+     *
+     * @return $this
+     */
+    public function addAccessToken($accessToken)
+    {
+        $this->accessTokens->add($accessToken);
+        return $this;
+    }
 
-         /**
-          * @ORM\ManyToMany(targetEntity="OAuth2AuthCode", inversedBy="scopes")
-          * @ORM\JoinTable(name="oauth_auth_code_scope")
-          * @var ArrayCollection
-          **/
-          private $authCodes;
+    /**
+     * @ORM\ManyToMany(targetEntity="OAuth2AuthCode", inversedBy="scopes")
+     * @ORM\JoinTable(name="oauth_auth_code_scope")
+     * @var ArrayCollection
+     **/
+    private $authCodes;
 
-          /**
-           * @return ArrayCollection
-           */
-          public function getAuthCodes() {
-              return $this->authCodes;
-          }
+    /**
+     * @return ArrayCollection
+     */
+    public function getAuthCodes()
+    {
+        return $this->authCodes;
+    }
 
-          /**
-           * @param OAuth2AuthCode $scope
-           *
-           * @return $this
-           */
-          public function addAuthCode($authCode) {
-              $this->authCodes->add($authCode);
-              return $this;
-          }
+    /**
+     * @param OAuth2AuthCode $scope
+     *
+     * @return $this
+     */
+    public function addAuthCode($authCode)
+    {
+        $this->authCodes->add($authCode);
+        return $this;
+    }
 
-          /**
-           * @ORM\ManyToMany(targetEntity="OAuth2Session", inversedBy="scopes")
-           * @ORM\JoinTable(name="oauth_session_scope")
-           * @var ArrayCollection
-           **/
-           private $sessions;
+    /**
+     * @ORM\ManyToMany(targetEntity="OAuth2Session", inversedBy="scopes")
+     * @ORM\JoinTable(name="oauth_session_scope")
+     * @var ArrayCollection
+     **/
+    private $sessions;
 
-           /**
-            * @return ArrayCollection
-            */
-           public function getSessions() {
-               return $this->sessions;
-           }
+    /**
+     * @return ArrayCollection
+     */
+    public function getSessions()
+    {
+        return $this->sessions;
+    }
 
-           /**
-            * @param OAuth2Session $scope
-            *
-            * @return $this
-            */
-           public function addSession($session) {
-               $this->sessions->add($session);
-               return $this;
-           }
+    /**
+     * @param OAuth2Session $scope
+     *
+     * @return $this
+     */
+    public function addSession($session)
+    {
+        $this->sessions->add($session);
+        return $this;
+    }
 
-         public function __construct() {
-             $this->accessTokens = new ArrayCollection;
-             $this->authCodes = new ArrayCollection;
-             $this->sessions = new ArrayCollection;
-         }
+    public function __construct()
+    {
+        $this->accessTokens = new ArrayCollection;
+        $this->authCodes = new ArrayCollection;
+        $this->sessions = new ArrayCollection;
+    }
 }
