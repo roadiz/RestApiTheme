@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2014, Ambroise Maupate and Julien Blanchet
+ * Copyright © 2015, Ambroise Maupate and Julien Blanchet
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,23 @@
  * be used in advertising or otherwise to promote the sale, use or other dealings
  * in this Software without prior written authorization from Ambroise Maupate and Julien Blanchet.
  *
- * @file ApiController.php
+ * @file ApiTrait.php
  * @author Maxime Constantinian
  */
 
-namespace Themes\RestApiTheme\Controllers;
+namespace Themes\RestApiTheme\Traits;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Themes\RestApiTheme\RestApiThemeApp;
 use Themes\RestApiTheme\Storages;
 
-class ApiController extends RestApiThemeApp
+trait ApiTrait
 {
     protected $server;
     protected $authCodeGrant;
     protected $refrehTokenGrant;
 
-    public function prepareApiServer() {
+    public function prepareApiServer()
+    {
         // Set up the OAuth 2.0 authorization server
         $this->server = new \League\OAuth2\Server\AuthorizationServer();
         $this->server->setSessionStorage(new Storages\SessionStorage());
@@ -57,9 +56,8 @@ class ApiController extends RestApiThemeApp
         $this->server->addGrantType($this->refreshTokenGrant);
     }
 
-
-
-    public function sendJson($statusCode, $data) {
+    public function sendJson($statusCode, $data)
+    {
         $response = new JsonResponse();
         $response->setData($data);
         $response->setStatusCode($statusCode);
