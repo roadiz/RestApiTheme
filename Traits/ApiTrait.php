@@ -27,7 +27,6 @@
  * @file ApiTrait.php
  * @author Maxime Constantinian
  */
-
 namespace Themes\RestApiTheme\Traits;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,12 +42,12 @@ trait ApiTrait
     {
         // Set up the OAuth 2.0 authorization server
         $this->server = new \League\OAuth2\Server\AuthorizationServer();
-        $this->server->setSessionStorage(new Storages\SessionStorage());
-        $this->server->setAccessTokenStorage(new Storages\AccessTokenStorage());
-        $this->server->setRefreshTokenStorage(new Storages\RefreshTokenStorage());
-        $this->server->setClientStorage(new Storages\ClientStorage());
-        $this->server->setScopeStorage(new Storages\ScopeStorage());
-        $this->server->setAuthCodeStorage(new Storages\AuthCodeStorage());
+        $this->server->setSessionStorage(new Storages\SessionStorage($this->getService('em'), $this->getService('logger')));
+        $this->server->setAccessTokenStorage(new Storages\AccessTokenStorage($this->getService('em'), $this->getService('logger')));
+        $this->server->setRefreshTokenStorage(new Storages\RefreshTokenStorage($this->getService('em'), $this->getService('logger')));
+        $this->server->setClientStorage(new Storages\ClientStorage($this->getService('em'), $this->getService('logger')));
+        $this->server->setScopeStorage(new Storages\ScopeStorage($this->getService('em'), $this->getService('logger')));
+        $this->server->setAuthCodeStorage(new Storages\AuthCodeStorage($this->getService('em'), $this->getService('logger')));
 
         $this->authCodeGrant = new \League\OAuth2\Server\Grant\AuthCodeGrant();
         $this->server->addGrantType($this->authCodeGrant);

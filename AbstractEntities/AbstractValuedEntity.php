@@ -39,7 +39,7 @@ use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
 abstract class AbstractValuedEntity extends AbstractEntity
 {
     /**
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string", nullable=true)
      * @var string
      */
     private $value;
@@ -61,6 +61,31 @@ abstract class AbstractValuedEntity extends AbstractEntity
     {
         $this->value = $value;
 
+        return $this;
+    }
+
+    /**
+     * @ORM\Column(name="expire_time", type="datetime", nullable=true)
+     * @var DateTime
+     */
+    private $expireTime;
+
+    /**
+     * @return DateTime
+     */
+    public function getExpireTime()
+    {
+        return $this->expireTime;
+    }
+
+    /**
+     * @param DateTime $expireTime
+     *
+     * @return $this
+     */
+    public function setExpireTime($expireTime)
+    {
+        $this->expireTime = $expireTime;
         return $this;
     }
 }

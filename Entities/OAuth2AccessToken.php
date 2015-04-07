@@ -44,10 +44,9 @@ use Themes\RestApiTheme\Entities\OAuth2Session;
 class OAuth2AccessToken extends AbstractValuedEntity
 {
     /**
-     * @ORM\OneToOne(targetEntity="OAuth2RefreshToken", inversedBy="accessToken")
-     * @ORM\JoinColumn(name="refresh_token_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2RefreshToken", mappedBy="accessToken")
      **/
-    private $refreshToken;
+    private $refreshToken = null;
 
     /**
      * @return Themes\RestApiTheme\Entities\OAuth2RefreshToken
@@ -58,21 +57,10 @@ class OAuth2AccessToken extends AbstractValuedEntity
     }
 
     /**
-     * @param Themes\RestApiTheme\Entities\OAuth2RefreshToken $refreshToken
-     *
-     * @return $this
-     */
-    public function setRefreshToken($refreshToken)
-    {
-        $this->refreshToken = $refreshToken;
-        return $this;
-    }
-
-    /**
      * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Session")
      * @ORM\JoinColumn(name="session_id", referencedColumnName="id", onDelete="CASCADE")
      **/
-    private $session;
+    private $session = null;
 
     /**
      * @return Themes\RestApiTheme\Entities\OAuth2Session
@@ -90,31 +78,6 @@ class OAuth2AccessToken extends AbstractValuedEntity
     public function setSession($session)
     {
         $this->session = $session;
-        return $this;
-    }
-
-    /**
-     * @ORM\Column(name="expire_time", type="datetime", nullable=false)
-     * @var DateTime
-     */
-    private $expireTime;
-
-    /**
-     * @return DateTime
-     */
-    public function getExpireTime()
-    {
-        return $this->expireTime;
-    }
-
-    /**
-     * @param DateTime $expireTime
-     *
-     * @return $this
-     */
-    public function setExpireTime($expireTime)
-    {
-        $this->expireTime = $expireTime;
         return $this;
     }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2014, Ambroise Maupate and Julien Blanchet
+ * Copyright © 2015, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * Except as contained in this notice, the name of the ROADIZ shall not
- * be used in advertising or otherwise to promote the sale, use or other dealings
- * in this Software without prior written authorization from Ambroise Maupate and Julien Blanchet.
- *
- * @file ScopeStorage.php
- * @author Maxime Constantinian
+ * @file AbstractStorage.php
+ * @author Ambroise Maupate
  */
 
 namespace Themes\RestApiTheme\Storages;
 
-use League\OAuth2\Server\Entity\ScopeEntity;
-use League\OAuth2\Server\Storage\ScopeInterface;
-use Themes\RestApiTheme\Storages\AbstractStorage;
+use Doctrine\ORM\EntityManager;
+use League\OAuth2\Server\Storage\AbstractStorage as LeagueAbstractStorage;
+use Psr\Log\LoggerInterface;
 
-class ScopeStorage extends AbstractStorage implements ScopeInterface
+class AbstractStorage extends LeagueAbstractStorage
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function get($scope, $grantType = null, $clientId = null)
+    protected $em;
+    protected $logger;
+
+    public function __construct(EntityManager $em, LoggerInterface $logger)
     {
-        $result = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")
-                       ->findOneByName($scope);
-
-        if ($result !== null) {
-            return (new ScopeEntity($this->server))->hydrate([
-                'id' => $result->getName(),
-                'description' => $result->getDescription(),
-            ]);
-        }
-        return;
+        $this->em = $em;
+        $this->logger = $logger;
     }
-
 }

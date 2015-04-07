@@ -69,31 +69,6 @@ class OAuth2AuthCode extends AbstractValuedEntity
     }
 
     /**
-     * @ORM\Column(type="datetime", nullable=false)
-     * @var DateTime
-     */
-    private $expireTime;
-
-    /**
-     * @return DateTime
-     */
-    public function getExpireTime()
-    {
-        return $this->expireTime;
-    }
-
-    /**
-     * @param DateTime $expireTime
-     *
-     * @return $this
-     */
-    public function setExpireTime($expireTime)
-    {
-        $this->expireTime = $expireTime;
-        return $this;
-    }
-
-    /**
      * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="authCodes")
      * @var ArrayCollection
      **/

@@ -41,10 +41,12 @@ use Themes\RestApiTheme\Entities\OAuth2AccessToken;
  */
 class OAuth2RefreshToken extends AbstractValuedEntity
 {
+
     /**
-     * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2AccessToken", mappedBy="refreshToken")
+     * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2AccessToken", inversedBy="refreshToken")
+     * @ORM\JoinColumn(name="access_token_id", referencedColumnName="id", onDelete="CASCADE")
      **/
-    private $accessToken;
+    private $accessToken = null;
 
     /**
      * @return Themes\RestApiTheme\Entities\OAuth2AccessToken
@@ -62,31 +64,6 @@ class OAuth2RefreshToken extends AbstractValuedEntity
     public function setAccessToken($accessToken)
     {
         $this->accessToken = $accessToken;
-        return $this;
-    }
-
-    /**
-     * @ORM\Column(name="expire_time", type="datetime", nullable=false)
-     * @var DateTime
-     */
-    private $expireTime;
-
-    /**
-     * @return DateTime
-     */
-    public function getExpireTime()
-    {
-        return $this->expireTime;
-    }
-
-    /**
-     * @param DateTime $expireTime
-     *
-     * @return $this
-     */
-    public function setExpireTime($expireTime)
-    {
-        $this->expireTime = $expireTime;
         return $this;
     }
 

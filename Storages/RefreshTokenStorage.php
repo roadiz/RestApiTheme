@@ -31,12 +31,9 @@
 namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\RefreshTokenEntity;
-use League\OAuth2\Server\Entity\ScopeEntity;
-use League\OAuth2\Server\Storage\AbstractStorage;
 use League\OAuth2\Server\Storage\RefreshTokenInterface;
 use Themes\RestApiTheme\Entities\OAuth2RefreshToken;
-
-use RZ\Roadiz\Core\Kernel;
+use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterface
 {
@@ -45,12 +42,12 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
      */
     public function get($token)
     {
-        $result = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2RefreshToken")
-                                          ->findOneByValue($token);
+        $result = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2RefreshToken")
+                       ->findOneByValue($token);
         if ($result !== null) {
             $token = (new RefreshTokenEntity($this->server))
-                        ->setId($result->getValue())
-                        ->setExpireTime($result->getExpireTime()->getTimestamp());
+                ->setId($result->getValue())
+                ->setExpireTime($result->getExpireTime()->getTimestamp());
             if ($result->getAccessToken() !== null) {
                 $token->setAccessTokenId($result->getAccessToken()->getValue());
             }
@@ -64,27 +61,22 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
      */
     public function create($token, $expireTime, $accessToken)
     {
-        $em = Kernel::getService("em");
+        $accessTokenObj = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
+                               ->findOneByValue($accessToken);
 
-        $accessToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
-                          ->findOneByValue($accessToken);
-
-        $refreshToken = $accessToken->getRefreshToken();
-
-        if ($refreshToken === null) {
+        if (null !== $accessTokenObj) {
             $refreshToken = new OAuth2RefreshToken();
-            $em->persist($refreshToken);
+            $refreshToken->setAccessToken($accessTokenObj);
+            $refreshToken->setValue($token);
+            $datetime = new \DateTime();
+            $refreshToken->setExpireTime($datetime->setTimestamp($expireTime));
+
+            $this->em->persist($refreshToken);
+            $this->em->flush();
+            $this->logger->warning('New OAuth2RefreshToken id#' . $refreshToken->getId(), ['token' => $refreshToken]);
+        } else {
+            $this->logger->warning('No access_token (' . $accessToken . ') available for creating refresh_token');
         }
-
-        $refreshToken->setValue($token);
-        $datetime = new \DateTime();
-        $refreshToken->setExpireTime($datetime->setTimestamp($expireTime));
-        $refreshToken->setAccessToken($accessToken);
-
-        $em->flush();
-
-        $accessToken->setRefreshToken($refreshToken);
-        $em->flush();
     }
 
     /**
@@ -92,11 +84,14 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
      */
     public function delete(RefreshTokenEntity $token)
     {
-        $em = Kernel::getService("em");
-
-        $refreshToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2RefreshToken")
-                           ->findOneByValue($token->getId());
-        $em->remove($refreshToken);
-        $em->flush();
+        $refreshToken = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2RefreshToken")
+                             ->findOneByValue($token->getId());
+        if (null !== $refreshToken) {
+            $this->logger->warning('Delete refreshToken id#' . $refreshToken->getId(), ['token' => $refreshToken]);
+            $this->em->remove($refreshToken);
+            $this->em->flush();
+        } else {
+            $this->logger->warning('Cannot delete refreshToken.');
+        }
     }
 }

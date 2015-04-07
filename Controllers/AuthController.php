@@ -66,6 +66,8 @@ class AuthController extends RozierApp
                 return $reponse;
             }
 
+            $this->getService("logger")->warning($e->getMessage());
+
             return $this->sendJson($e->httpStatusCode,
                 [
                     'error' => $e->errorType,
@@ -123,11 +125,13 @@ class AuthController extends RozierApp
             } else {
                 $error = new \League\OAuth2\Server\Util\AccessDeniedException;
 
+                $this->getService("logger")->warning($error->getMessage());
+
                 $redirectUri = new \League\OAuth2\Server\Util\RedirectUri(
                     $authParams['redirect_uri'],
                     [
                         'error' => $error->errorType,
-                        'message' => $e->getMessage(),
+                        'message' => $error->getMessage(),
                     ]
                 );
 

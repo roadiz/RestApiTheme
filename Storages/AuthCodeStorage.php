@@ -32,11 +32,9 @@ namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
-use League\OAuth2\Server\Storage\AbstractStorage;
 use League\OAuth2\Server\Storage\AuthCodeInterface;
 use Themes\RestApiTheme\Entities\OAuth2AuthCode;
-
-use RZ\Roadiz\Core\Kernel;
+use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
 {
@@ -45,41 +43,42 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
      */
     public function get($code)
     {
-        $q = Kernel::getService("em")->createQuery("SELECT a FROM Themes\RestApiTheme\Entities\OAuth2AuthCode a WHERE a.expireTime >= :expireTime AND a.value = :value");
-        $q->setParameter('expireTime', new \DateTime());
-        $q->setParameter('value', $code);
-        $result = $q->getSingleResult();
+        try {
+            $q = $this->em->createQuery("SELECT a FROM Themes\RestApiTheme\Entities\OAuth2AuthCode a WHERE a.expireTime >= :expireTime AND a.value = :value");
+            $q->setParameter('expireTime', new \DateTime());
+            $q->setParameter('value', $code);
+            $result = $q->getSingleResult();
 
-        if ($result !== null) {
-            $token = (new AuthCodeEntity($this->server))
-                        ->setId($result->getValue())
-                        ->setRedirectUri($result->getSession()->getClient()->getRedirectUri())
-                        ->setExpireTime($result->getExpireTime()->getTimestamp());
-            return $token;
+            if ($result !== null) {
+                $token = (new AuthCodeEntity($this->server))
+                    ->setId($result->getValue())
+                    ->setRedirectUri($result->getSession()->getClient()->getRedirectUri())
+                    ->setExpireTime($result->getExpireTime()->getTimestamp());
+                return $token;
+            }
+        } catch (\Doctrine\ORM\ORMException $e) {
+            // do nothing
         }
     }
 
     public function create($token, $expireTime, $sessionId, $redirectUri)
     {
-        $em = Kernel::getService("em");
+        $session = $this->em->find("Themes\RestApiTheme\Entities\OAuth2Session", $sessionId);
 
-        $session = $em->find("Themes\RestApiTheme\Entities\OAuth2Session", $sessionId);
-
-        $authCode = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")->findOneBySession($session);
+        $authCode = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")->findOneBySession($session);
 
         if ($authCode === null) {
             $authCode = new OAuth2AuthCode();
-
-            $em->persist($authCode);
+            $authCode->setSession($session);
+            $this->em->persist($authCode);
+            $this->em->flush();
         }
 
-
         $authCode->setValue($token);
-        $authCode->setSession($session);
         $datetime = new \DateTime();
         $authCode->setExpireTime($datetime->setTimestamp($expireTime));
 
-        $em->flush();
+        $this->em->flush();
     }
 
     /**
@@ -87,15 +86,15 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
      */
     public function getScopes(AuthCodeEntity $token)
     {
-        $authCode = Kernel::getService("em")->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                                               ->findOneByValue($token->getId());
+        $authCode = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
+                         ->findOneByValue($token->getId());
 
         $response = [];
         if ($authCode->getScopes()->count() > 0) {
             foreach ($authCode->getScopes() as $row) {
                 $scope = (new ScopeEntity($this->server))->hydrate([
-                    'id'            =>  $row->getName(),
-                    'description'   =>  $row->getDescription(),
+                    'id' => $row->getName(),
+                    'description' => $row->getDescription(),
                 ]);
                 $response[] = $scope;
             }
@@ -108,15 +107,13 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
      */
     public function associateScope(AuthCodeEntity $token, ScopeEntity $scope)
     {
-        $em = Kernel::getService("em");
-
-        $authCode = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                       ->findOneByValue($token->getId());
-        $scope = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")
-                    ->findOneByName($scope->getId());
+        $authCode = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
+                         ->findOneByValue($token->getId());
+        $scope = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")
+                      ->findOneByName($scope->getId());
         $authCode->addScope($scope);
 
-        $em->flush();
+        $this->em->flush();
     }
 
     /**
@@ -124,11 +121,9 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
      */
     public function delete(AuthCodeEntity $token)
     {
-        $em = Kernel::getService("em");
-
-        $authCode = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
-                          ->findOneByValue($token->getId());
-        $em->remove($authCode);
-        $em->flush();
+        $authCode = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
+                         ->findOneByValue($token->getId());
+        $this->em->remove($authCode);
+        $this->em->flush();
     }
 }
