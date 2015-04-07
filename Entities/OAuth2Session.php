@@ -78,8 +78,7 @@ abstract class OAuth2Session extends AbstractEntity
           }
 
           /**
-           * @ORM\ManyToMany(targetEntity="OAuth2Scope", inversedBy="sessions", cascade={"remove"})
-           * @ORM\JoinTable(name="oauth_session_scope")
+           * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="sessions")
            * @var ArrayCollection
            **/
            private $scopes;

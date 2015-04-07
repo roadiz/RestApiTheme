@@ -155,7 +155,7 @@ class ClientController extends RozierApp
         $client->setName($data["name"]);
         $client->setRedirectUri($data["redirectUri"]);
         $client->setClientId(md5(uniqid($data["name"], true)));
-        $client->setClientSecret((new PasswordGenerator)->generatePassword(32));
+        $client->setClientSecret(md5(md5(uniqid($data["name"], true)));
 
         $this->getService("em")->persist($client);
         $this->getService("em")->flush();

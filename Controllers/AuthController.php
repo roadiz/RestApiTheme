@@ -106,7 +106,6 @@ class AuthController extends ApiController
 
         if ($form->isValid()) {
             if ($form->get("approve")->isClicked()) {
-
                 $redirectUri = $this->server->getGrantType('authorization_code')->newAuthorizeRequest('user', $user->getId(), $authParams);
 
                 $reponse = new RedirectResponse(

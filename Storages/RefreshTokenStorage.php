@@ -60,11 +60,11 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
     /**
      * {@inheritdoc}
      */
-    public function create($token, $expireTime, $accessToke)
+    public function create($token, $expireTime, $accessToken)
     {
         $em = Kernel::getService("em");
 
-        $accessToken = $em->getRepository()->findOneByAccessToken("Themes\RestApiTheme\Entities\OAuth2Session", $accessToken);
+        $accessToken = $em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")->findOneByAccessToken($accessToken);
 
         $refreshToken = new OAuth2RefreshToken();
         $refreshToken->setRefreshToken($token);

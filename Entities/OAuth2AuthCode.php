@@ -113,8 +113,7 @@ class OAuth2AuthCode extends AbstractEntity
       }
 
       /**
-       * @ORM\ManyToMany(targetEntity="OAuth2Scope", inversedBy="authCodes", cascade={"remove"})
-       * @ORM\JoinTable(name="oauth_auth_code_scope")
+       * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="authCodes")
        * @var ArrayCollection
        **/
        private $scopes;

@@ -91,7 +91,8 @@ class OAuth2Scope extends AbstractEntity
         }
 
         /**
-         * @ORM\ManyToMany(targetEntity="OAuth2AccessToken", mappedBy="scopes")
+         * @ORM\ManyToMany(targetEntity="OAuth2AccessToken", inversedBy="scopes", cascade={"remove"})
+         * @ORM\JoinTable(name="oauth_access_token_scope")
          * @var ArrayCollection
          **/
          private $accessTokens;
@@ -114,7 +115,8 @@ class OAuth2Scope extends AbstractEntity
          }
 
          /**
-          * @ORM\ManyToMany(targetEntity="OAuth2AuthCode", mappedBy="scopes")
+          * @ORM\ManyToMany(targetEntity="OAuth2AuthCode", inversedBy="scopes", cascade={"remove"})
+          * @ORM\JoinTable(name="oauth_auth_code_scope")
           * @var ArrayCollection
           **/
           private $authCodes;
@@ -137,7 +139,8 @@ class OAuth2Scope extends AbstractEntity
           }
 
           /**
-           * @ORM\ManyToMany(targetEntity="OAuth2Session", mappedBy="scopes")
+           * @ORM\ManyToMany(targetEntity="OAuth2Session", inversedBy="scopes", cascade={"remove"})
+           * @ORM\JoinTable(name="oauth_session_scope")
            * @var ArrayCollection
            **/
            private $sessions;

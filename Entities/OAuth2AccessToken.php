@@ -113,8 +113,7 @@ class OAuth2AccessToken extends AbstractEntity
       }
 
     /**
-     * @ORM\ManyToMany(targetEntity="OAuth2Scope", inversedBy="accessTokens", cascade={"remove"})
-     * @ORM\JoinTable(name="oauth_access_token_scope")
+     * @ORM\ManyToMany(targetEntity="OAuth2Scope", mappedBy="accessTokens")
      * @var ArrayCollection
      **/
      private $scopes;

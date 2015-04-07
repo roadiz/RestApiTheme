@@ -53,7 +53,7 @@ class ApiLoginController extends LoginController
 
         $user = $this->getService("securityContext")->getToken()->getUser();
 
-        if ($user) {
+        if ($this->getService("securityContext")->isGranted('IS_AUTHENTICATED_FULLY')) {
 
             // Everything is okay, save $authParams to the a session and redirect the user to sign-in
             $session->set('authParams', $authParams);

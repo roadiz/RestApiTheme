@@ -17,7 +17,6 @@
     </div>
     <div id="login-formGlobal">
     	<h1 id="tag-title">{% trans %}Authorize scope{% endtrans %}</h1>
-        {% for scope in scopes %}
             <table class="content-table uk-table">
                 <thead>
                     <tr>
@@ -28,13 +27,12 @@
                 <tbody>
                     {% for scope in scopes %}
                     <tr>
-                        <td>{{ scope.name }}</td>
+                        <td>{{ scope.id }}</td>
                         <td>{{ scope.description }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endfor %}
        	{% form_theme form 'forms.html.twig' %}
         <form id="login-form" class="uk-form uk-form-stacked {% if error %}uk-animation-shake{% endif %}" action="{{ path('authorizeScopePage') }}" method="post" {{ form_enctype(form) }}>
             {{ form_widget(form) }}
