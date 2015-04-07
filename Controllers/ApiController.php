@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Themes\RestApiTheme\RestApiThemeApp;
 use Themes\RestApiTheme\Storages;
 
-class ApiController extends RestApiThemeApp
+trait ApiController
 {
     protected $server;
     protected $authCodeGrant;

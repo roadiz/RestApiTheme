@@ -31,12 +31,15 @@
 namespace Themes\RestApiTheme\Controllers;
 
 use Themes\RestApiTheme\Storages;
+use Themes\Rozier\RozierApp;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class AuthController extends ApiController
+class AuthController extends RozierApp
 {
+    use ApiController;
+
     public function oauthAction(Request $request) {
         $method = $request->getMethod();
 
@@ -95,9 +98,11 @@ class AuthController extends ApiController
         $builder = $this->getService('formFactory')
                         ->createBuilder()
                         ->add('approve', 'submit', [
+                            'attr' => ['class' => 'uk-button uk-button-primary'],
                             'label' => $this->getTranslator()->trans('api.scope.approve')
                         ])
                         ->add('cancel', 'submit', [
+                            'attr' => ['class' => 'uk-button'],
                             'label' => $this->getTranslator()->trans('api.scope.cancel')
                         ]);
 
@@ -138,7 +143,9 @@ class AuthController extends ApiController
         $this->assignation['scopes'] = $authParams['scopes'];
         $this->assignation['form'] = $form->createView();
 
-        return $this->render('scopeValidate.html.twig', $this->assignation, null);
+        var_dump($this->getService('twig.loaderFileSystem'));
+
+        return $this->render('scopeValidate.html.twig', $this->assignation);
     }
 
     public function accessTokenAction(Request $request) {
