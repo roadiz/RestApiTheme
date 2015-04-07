@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2014, Ambroise Maupate and Julien Blanchet
+ * Copyright © 2015, Ambroise Maupate and Julien Blanchet
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,28 +27,27 @@
  * @file AuthController.php
  * @author Maxime Constantinian
  */
-
 namespace Themes\RestApiTheme\Controllers;
 
-use Themes\RestApiTheme\Storages;
-use Themes\Rozier\RozierApp;
-
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Themes\Rozier\RozierApp;
 
 class AuthController extends RozierApp
 {
-    use ApiController;
+    use \Themes\RestApiTheme\Traits\ApiTrait;
 
-    public function oauthAction(Request $request) {
+    public function oauthAction(Request $request)
+    {
         $method = $request->getMethod();
 
         switch ($method) {
             case "GET":
                 break;
             default:
-                return $this->sendJson(500, ['error' => "Method not allowed.",
-                                             "message" => 'Calling method ' . $method . ' is not allowed.']);
+                return $this->sendJson(Response::HTTP_METHOD_NOT_ALLOWED, ['error' => "Method not allowed.",
+                    "message" => 'Calling method ' . $method . ' is not allowed.']);
         }
 
         $this->prepareApiServer();
@@ -62,15 +61,15 @@ class AuthController extends RozierApp
                     $e->getRedirectUri()
                 );
 
-                $reponse->setStatusCode(302);
+                $reponse->setStatusCode(Response::HTTP_FOUND);
 
                 return $reponse;
             }
 
             return $this->sendJson($e->httpStatusCode,
                 [
-                    'error'     =>  $e->errorType,
-                    'message'   =>  $e->getMessage(),
+                    'error' => $e->errorType,
+                    'message' => $e->getMessage(),
                 ]);
         }
 
@@ -83,12 +82,13 @@ class AuthController extends RozierApp
             )
         );
 
-        $response->setStatusCode(302);
+        $response->setStatusCode(Response::HTTP_FOUND);
         $response->prepare($request);
         return $response;
     }
 
-    public function authorizeAction(Request $request) {
+    public function authorizeAction(Request $request)
+    {
 
         $this->prepareApiServer();
         $user = $this->getService("securityContext")->getToken()->getUser();
@@ -99,11 +99,11 @@ class AuthController extends RozierApp
                         ->createBuilder()
                         ->add('approve', 'submit', [
                             'attr' => ['class' => 'uk-button uk-button-primary'],
-                            'label' => $this->getTranslator()->trans('api.scope.approve')
+                            'label' => $this->getTranslator()->trans('api.scope.approve'),
                         ])
                         ->add('cancel', 'submit', [
                             'attr' => ['class' => 'uk-button'],
-                            'label' => $this->getTranslator()->trans('api.scope.cancel')
+                            'label' => $this->getTranslator()->trans('api.scope.cancel'),
                         ]);
 
         $form = $builder->getForm();
@@ -111,13 +111,14 @@ class AuthController extends RozierApp
 
         if ($form->isValid()) {
             if ($form->get("approve")->isClicked()) {
-                $redirectUri = $this->server->getGrantType('authorization_code')->newAuthorizeRequest('user', $user->getId(), $authParams);
+                $redirectUri = $this->server->getGrantType('authorization_code')
+                                            ->newAuthorizeRequest('user', $user->getId(), $authParams);
 
                 $response = new RedirectResponse(
                     $redirectUri
                 );
 
-                $response->setStatusCode(200);
+                $response->setStatusCode(Response::HTTP_OK);
 
             } else {
                 $error = new \League\OAuth2\Server\Util\AccessDeniedException;
@@ -125,8 +126,8 @@ class AuthController extends RozierApp
                 $redirectUri = new \League\OAuth2\Server\Util\RedirectUri(
                     $authParams['redirect_uri'],
                     [
-                        'error' =>  $error->errorType,
-                        'message'   =>  $e->getMessage()
+                        'error' => $error->errorType,
+                        'message' => $e->getMessage(),
                     ]
                 );
 
@@ -134,7 +135,7 @@ class AuthController extends RozierApp
                     $redirectUri
                 );
 
-                $response->setStatusCode(302);
+                $response->setStatusCode(Response::HTTP_FOUND);
             }
             $response->prepare($request);
             return $response;
@@ -143,33 +144,42 @@ class AuthController extends RozierApp
         $this->assignation['scopes'] = $authParams['scopes'];
         $this->assignation['form'] = $form->createView();
 
-        var_dump($this->getService('twig.loaderFileSystem'));
-
         return $this->render('scopeValidate.html.twig', $this->assignation);
     }
 
-    public function accessTokenAction(Request $request) {
+    public function accessTokenAction(Request $request)
+    {
         $method = $request->getMethod();
 
         switch ($method) {
             case "POST":
                 break;
             default:
-                return $this->sendJson(500, ['error' => "Method not allowed.",
-                                             "message" => 'Calling method ' . $method . ' is not allowed.']);
+                return $this->sendJson(Response::HTTP_METHOD_NOT_ALLOWED, ['error' => "Method not allowed.",
+                    "message" => 'Calling method ' . $method . ' is not allowed.']);
         }
 
         $this->prepareApiServer();
 
-        //try {
+        try {
             $response = $this->server->issueAccessToken();
-            return $this->sendJson(200, $response);
+            return $this->sendJson(Response::HTTP_OK, $response);
 
-        // } catch (\Exception $e) {
-        //     return $this->sendJson($e->httpStatusCode, [
-        //         'error'     =>  $e->errorType,
-        //         'message'   =>  $e->getMessage()
-        //     ]);
-        // }
+        } catch (\Doctrine\ORM\ORMException $e) {
+            return $this->sendJson(Response::HTTP_INTERNAL_SERVER_ERROR, [
+                'error'     =>  '\Doctrine\ORM\ORMException',
+                'message'   =>  $e->getMessage()
+            ]);
+        } catch (\League\OAuth2\Server\Exception\OAuthException $e) {
+            return $this->sendJson($e->httpStatusCode, [
+                'error'     =>  $e->errorType,
+                'message'   =>  $e->getMessage()
+            ]);
+        } catch (\Exception $e) {
+            return $this->sendJson(Response::HTTP_INTERNAL_SERVER_ERROR, [
+                'error'     =>  'General exception',
+                'message'   =>  $e->getMessage()
+            ]);
+        }
     }
 }
