@@ -63,7 +63,7 @@ class ApiLoginController extends LoginController
             );
 
             $response->setStatusCode(302);
-
+            $response->prepare($request);
             return $response;
 
         } else {

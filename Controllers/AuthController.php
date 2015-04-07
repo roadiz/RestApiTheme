@@ -74,15 +74,15 @@ class AuthController extends ApiController
         // Everything is okay, save $authParams to the a session and redirect the user to sign-in
         $session = $this->getService('session');
         $session->set('authParams', $authParams);
-        $reponse = new RedirectResponse(
+        $response = new RedirectResponse(
             $this->getService('urlGenerator')->generate(
                 'signInPage'
             )
         );
 
-        $reponse->setStatusCode(302);
-
-        return $reponse;
+        $response->setStatusCode(302);
+        $response->prepare($request);
+        return $response;
     }
 
     public function authorizeAction(Request $request) {
@@ -108,11 +108,11 @@ class AuthController extends ApiController
             if ($form->get("approve")->isClicked()) {
                 $redirectUri = $this->server->getGrantType('authorization_code')->newAuthorizeRequest('user', $user->getId(), $authParams);
 
-                $reponse = new RedirectResponse(
+                $response = new RedirectResponse(
                     $redirectUri
                 );
 
-                $reponse->setStatusCode(200);
+                $response->setStatusCode(200);
 
             } else {
                 $error = new \League\OAuth2\Server\Util\AccessDeniedException;
@@ -125,21 +125,20 @@ class AuthController extends ApiController
                     ]
                 );
 
-                $reponse = new RedirectResponse(
+                $response = new RedirectResponse(
                     $redirectUri
                 );
 
-                $reponse->setStatusCode(302);
+                $response->setStatusCode(302);
             }
-
-            return $reponse;
+            $response->prepare($request);
+            return $response;
         }
 
         $this->assignation['scopes'] = $authParams['scopes'];
         $this->assignation['form'] = $form->createView();
 
-        return
-            $this->render('scopeValidate.html.twig', $this->assignation, null);
+        return $this->render('scopeValidate.html.twig', $this->assignation, null);
     }
 
     public function accessTokenAction(Request $request) {

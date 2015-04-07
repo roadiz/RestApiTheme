@@ -138,7 +138,7 @@ class ClientController extends RozierApp
                 );
                 $response->prepare($request);
 
-                return $response->send();
+                return $response;
             }
         }
 
@@ -268,7 +268,7 @@ class ClientController extends RozierApp
             );
             $response->prepare($request);
 
-            return $response->send();
+            return $response;
         }
 
         $this->assignation['form'] = $form->createView();
