@@ -80,7 +80,7 @@ class ScopeController extends RozierApp
                 )
             )
             ->getForm();
-        $form->handleRequest();
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             try {
@@ -165,7 +165,7 @@ class ScopeController extends RozierApp
                 )
             )
             ->getForm();
-        $form->handleRequest();
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $data = $form->getData();
@@ -219,7 +219,7 @@ class ScopeController extends RozierApp
         }
 
         $form = $this->buildDeleteForm($scope);
-        $form->handleRequest();
+        $form->handleRequest($request);
 
         if ($form->isValid() &&
             $form->getData()['scopeId'] == $scope->getId()) {

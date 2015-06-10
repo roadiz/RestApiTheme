@@ -108,7 +108,7 @@ class ClientController extends RozierApp
                 )
             )
             ->getForm();
-        $form->handleRequest();
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             try {
@@ -195,7 +195,7 @@ class ClientController extends RozierApp
                 )
             )
             ->getForm();
-        $form->handleRequest();
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $data = $form->getData();
@@ -249,7 +249,7 @@ class ClientController extends RozierApp
         }
 
         $form = $this->buildDeleteForm($client);
-        $form->handleRequest();
+        $form->handleRequest($request);
 
         if ($form->isValid() &&
             $form->getData()['clientId'] == $client->getId()) {

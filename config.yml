@@ -6,7 +6,7 @@ themeDir: "RestApiTheme"
 supportedLocale:
     - "en"
     - "fr"
-versionRequire: "0.7"
+versionRequire: "0.8.2"
 importFiles:
     roles: []
     groups: []

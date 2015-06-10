@@ -34,7 +34,7 @@ namespace Themes\RestApiTheme\Controllers;
 use RZ\Roadiz\Utils\MediaFinders\SplashbasePictureFinder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Themes\Rozier\Controllers\LoginController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -51,9 +51,9 @@ class ApiLoginController extends LoginController
         $session = $this->getService('session');
         $authParams = $session->get('authParams');
 
-        $user = $this->getService("securityContext")->getToken()->getUser();
+        $user = $this->getUser();
 
-        if ($this->getService("securityContext")->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
 
             // Everything is okay, save $authParams to the a session and redirect the user to sign-in
             $session->set('authParams', $authParams);
@@ -72,11 +72,11 @@ class ApiLoginController extends LoginController
             $this->assignation['form'] = $form->createView();
 
             // get the login error if there is one
-            if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-                $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
+            if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
+                $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
             } else {
-                $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
-                $session->remove(SecurityContext::AUTHENTICATION_ERROR);
+                $error = $session->get(Security::AUTHENTICATION_ERROR);
+                $session->remove(Security::AUTHENTICATION_ERROR);
             }
 
             $this->assignation['error'] = $error;

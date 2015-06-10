@@ -93,7 +93,7 @@ class AuthController extends RozierApp
     {
 
         $this->prepareApiServer();
-        $user = $this->getService("securityContext")->getToken()->getUser();
+        $user = $this->getUser();
 
         $session = $this->getService('session');
         $authParams = $session->get('authParams');
@@ -109,7 +109,7 @@ class AuthController extends RozierApp
                         ]);
 
         $form = $builder->getForm();
-        $form->handleRequest();
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             if ($form->get("approve")->isClicked()) {
