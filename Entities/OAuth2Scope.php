@@ -32,9 +32,6 @@ namespace Themes\RestApiTheme\Entities;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
-use Themes\RestApiTheme\Entities\OAuth2AccessToken;
-use Themes\RestApiTheme\Entities\OAuth2AuthCode;
-use Themes\RestApiTheme\Entities\OAuth2Session;
 
 /**
  * OAuth2Scope store all information about OAuth2 scope.
@@ -84,8 +81,7 @@ class OAuth2Scope extends AbstractEntity
     }
 
     /**
-     * @param string $name
-     *
+     * @param string $description
      * @return $this
      */
     public function setDescription($description)
@@ -110,8 +106,7 @@ class OAuth2Scope extends AbstractEntity
     }
 
     /**
-     * @param OAuth2AccessToken $scope
-     *
+     * @param OAuth2AccessToken $accessToken
      * @return $this
      */
     public function addAccessToken($accessToken)
@@ -136,7 +131,7 @@ class OAuth2Scope extends AbstractEntity
     }
 
     /**
-     * @param OAuth2AuthCode $scope
+     * @param OAuth2AuthCode $authCode
      *
      * @return $this
      */
@@ -162,8 +157,7 @@ class OAuth2Scope extends AbstractEntity
     }
 
     /**
-     * @param OAuth2Session $scope
-     *
+     * @param OAuth2Session $session
      * @return $this
      */
     public function addSession($session)

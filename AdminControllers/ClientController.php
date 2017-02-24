@@ -30,33 +30,24 @@
 
 namespace Themes\RestApiTheme\AdminControllers;
 
-use Themes\Rozier\RozierApp;
-
-use Themes\RestApiTheme\Entities\OAuth2Client;
-
-use RZ\Roadiz\Core\ListManagers\EntityListManager;
-use RZ\Roadiz\Utils\StringHandler;
-use RZ\Roadiz\Utils\Security\PasswordGenerator;
-
 use RZ\Roadiz\Core\Exceptions\EntityAlreadyExistsException;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use RZ\Roadiz\Core\ListManagers\EntityListManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Themes\RestApiTheme\Entities\OAuth2Client;
+use Themes\Rozier\RozierApp;
 
 class ClientController extends RozierApp
 {
-
     public function listAction(
         Request $request
     ) {
 
         $listManager = new EntityListManager(
             $request,
-            $this->getService("em"),
-            "Themes\RestApiTheme\Entities\OAuth2Client",
+            $this->get("em"),
+            'Themes\RestApiTheme\Entities\OAuth2Client',
             [],
             array(
               "id" => "DESC"
@@ -64,11 +55,8 @@ class ClientController extends RozierApp
         );
 
         $listManager->handle();
-
         $this->assignation['filters'] = $listManager->getAssignation();
         $this->assignation['clients'] = $listManager->getEntities();
-
-        //$this->getService('stopwatch')->start('twigRender');
 
         return $this->render('admin/client/list.html.twig', $this->assignation, null,
                              \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
@@ -77,15 +65,12 @@ class ClientController extends RozierApp
     /**
      * Handle client creation pages.
      *
-     * @param Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return Symfony\Component\HttpFoundation\Response
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function addAction(Request $request)
     {
-        //$this->validateAccessForRole('ROLE_ACCESS_NEWS');
-
-        $form = $this->getService('formFactory')
+        $form = $this->get('formFactory')
             ->createBuilder()
             ->add(
                 'name',
@@ -113,7 +98,6 @@ class ClientController extends RozierApp
         if ($form->isValid()) {
             try {
                 $client = $this->createClient($form->getData());
-
                 $msg = $this->getTranslator()->trans(
                     'oauth.client.%name%.created',
                     array('%name%'=>$client->getName())
@@ -121,7 +105,7 @@ class ClientController extends RozierApp
                 $this->publishConfirmMessage($request, $msg);
 
                 $response = new RedirectResponse(
-                    $this->getService('urlGenerator')->generate(
+                    $this->get('urlGenerator')->generate(
                         'clientAdminListPage'
                     )
                 );
@@ -132,7 +116,7 @@ class ClientController extends RozierApp
                 $this->publishErrorMessage($request, $e->getMessage());
 
                 $response = new RedirectResponse(
-                    $this->getService('urlGenerator')->generate(
+                    $this->get('urlGenerator')->generate(
                         'clientAdminAddPage'
                     )
                 );
@@ -157,20 +141,19 @@ class ClientController extends RozierApp
         $client->setClientId(md5(uniqid($data["name"], true)));
         $client->setClientSecret(md5(md5(uniqid($data["name"], true))));
 
-        $this->getService("em")->persist($client);
-        $this->getService("em")->flush();
+        $this->get("em")->persist($client);
+        $this->get("em")->flush();
         return $client;
     }
 
     public function editAction(Request $request, $clientId)
     {
-        //$this->validateAccessForRole('ROLE_ACCESS_NEWS');
-
-        $client =  $this->getService("em")->find("Themes\RestApiTheme\Entities\OAuth2Client", $clientId);
+        /** @var OAuth2Client $client */
+        $client = $this->get("em")->find("Themes\RestApiTheme\Entities\OAuth2Client", $clientId);
         if ($client === null) {
             return $this->throw404();
         }
-        $form = $this->getService('formFactory')
+        $form = $this->get('formFactory')
             ->createBuilder()
             ->add(
                 'name',
@@ -199,11 +182,10 @@ class ClientController extends RozierApp
 
         if ($form->isValid()) {
             $data = $form->getData();
-
             $client->setName($data['name']);
             $client->setRedirectUri($data['redirectUri']);
 
-            $this->getService('em')->flush();
+            $this->get('em')->flush();
 
             $msg = $this->getTranslator()->trans(
                 'client.%name%.updated',
@@ -213,7 +195,7 @@ class ClientController extends RozierApp
             $this->publishConfirmMessage($request, $msg);
 
             $response = new RedirectResponse(
-                $this->getService('urlGenerator')->generate(
+                $this->get('urlGenerator')->generate(
                     'clientAdminListPage'
                 )
             );
@@ -232,16 +214,15 @@ class ClientController extends RozierApp
     /**
      * Return an deletion form for requested client.
      *
-     * @param Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
      * @param int                                      $clientId
      *
-     * @return Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteAction(Request $request, $clientId)
     {
-        //$this->validateAccessForRole('ROLE_ACCESS_NEWS_DELETE');
-
-        $client = $this->getService('em')
+        /** @var OAuth2Client $client */
+        $client = $this->get('em')
             ->find('Themes\RestApiTheme\Entities\OAuth2Client', (int) $clientId);
 
         if ($client === null) {
@@ -253,8 +234,8 @@ class ClientController extends RozierApp
 
         if ($form->isValid() &&
             $form->getData()['clientId'] == $client->getId()) {
-            $this->getService('em')->remove($client);
-            $this->getService('em')->flush();
+            $this->get('em')->remove($client);
+            $this->get('em')->flush();
             $msg = $this->getTranslator()->trans(
                 'client.%name%.deleted',
                 array('%name%'=>$client->getName())
@@ -264,7 +245,7 @@ class ClientController extends RozierApp
              * Force redirect to avoid resending form when refreshing page
              */
             $response = new RedirectResponse(
-                $this->getService('urlGenerator')->generate('clientAdminListPage')
+                $this->get('urlGenerator')->generate('clientAdminListPage')
             );
             $response->prepare($request);
 
@@ -278,13 +259,13 @@ class ClientController extends RozierApp
     }
 
     /**
-     * @param RZ\Roadiz\Core\Entities\Node $node
-     *
+     * @param OAuth2Client $client
      * @return \Symfony\Component\Form\Form
+     *
      */
     protected function buildDeleteForm(OAuth2Client $client)
     {
-        $builder = $this->getService('formFactory')
+        $builder = $this->get('formFactory')
             ->createBuilder('form')
             ->add('clientId', 'hidden', array(
                 'data' => $client->getId(),

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Copyright © 2015, Ambroise Maupate and Julien Blanchet
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,27 +31,23 @@
 
 namespace Themes\RestApiTheme\Controllers;
 
-use RZ\Roadiz\Utils\MediaFinders\SplashbasePictureFinder;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Themes\Rozier\Controllers\LoginController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ApiLoginController extends LoginController
 {
     /**
-     * @param Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return Symfony\Component\HttpFoundation\Response
+     * @param Request $request
+     * @return Response
      */
     public function indexAction(Request $request)
     {
-        $session = $this->getService('session');
+        $session = $this->get('session');
         $authParams = $session->get('authParams');
-
-        $user = $this->getUser();
 
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
 
@@ -59,7 +55,7 @@ class ApiLoginController extends LoginController
             $session->set('authParams', $authParams);
 
             $response = new RedirectResponse(
-                $this->getService('urlGenerator')->generate('authorizeScopePage')
+                $this->get('urlGenerator')->generate('authorizeScopePage')
             );
 
             $response->setStatusCode(302);
@@ -92,23 +88,23 @@ class ApiLoginController extends LoginController
     {
         $defaults = [];
 
-        $builder = $this->getService('formFactory')
-                        ->createNamedBuilder(null, 'form', $defaults, [])
-                        ->add('_username', 'text', [
-                            'label' => $this->getTranslator()->trans('username'),
-                            'constraints' => [
-                                new NotBlank(),
-                            ],
-                        ])
-                        ->add('_password', 'password', [
-                            'label' => $this->getTranslator()->trans('password'),
-                            'constraints' => [
-                                new NotBlank(),
-                            ],
-                        ])
-                        ->add('_target_path', 'hidden', [
-                            'data' => $this->getService('urlGenerator')->generate('authorizeScopePage')
-                        ]);
+        $builder = $this->get('formFactory')
+            ->createNamedBuilder(null, 'form', $defaults, [])
+            ->add('_username', 'text', [
+                'label' => $this->getTranslator()->trans('username'),
+                'constraints' => [
+                    new NotBlank(),
+                ],
+            ])
+            ->add('_password', 'password', [
+                'label' => $this->getTranslator()->trans('password'),
+                'constraints' => [
+                    new NotBlank(),
+                ],
+            ])
+            ->add('_target_path', 'hidden', [
+                'data' => $this->get('urlGenerator')->generate('authorizeScopePage')
+            ]);
 
         return $builder->getForm();
     }

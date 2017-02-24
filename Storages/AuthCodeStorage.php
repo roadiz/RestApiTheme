@@ -30,10 +30,12 @@
 
 namespace Themes\RestApiTheme\Storages;
 
+use Doctrine\ORM\ORMException;
 use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AuthCodeInterface;
 use Themes\RestApiTheme\Entities\OAuth2AuthCode;
+use Themes\RestApiTheme\Entities\OAuth2Session;
 use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
@@ -56,15 +58,24 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
                     ->setExpireTime($result->getExpireTime()->getTimestamp());
                 return $token;
             }
-        } catch (\Doctrine\ORM\ORMException $e) {
+        } catch (ORMException $e) {
             // do nothing
+            return null;
         }
+        return null;
     }
 
+    /**
+     * @param string $token
+     * @param int $expireTime
+     * @param int $sessionId
+     * @param string $redirectUri
+     */
     public function create($token, $expireTime, $sessionId, $redirectUri)
     {
+        /** @var OAuth2Session $session */
         $session = $this->em->find("Themes\RestApiTheme\Entities\OAuth2Session", $sessionId);
-
+        /** @var OAuth2AuthCode $authCode */
         $authCode = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")->findOneBySession($session);
 
         if ($authCode === null) {

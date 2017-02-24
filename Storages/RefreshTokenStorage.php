@@ -33,7 +33,6 @@ namespace Themes\RestApiTheme\Storages;
 use League\OAuth2\Server\Entity\RefreshTokenEntity;
 use League\OAuth2\Server\Storage\RefreshTokenInterface;
 use Themes\RestApiTheme\Entities\OAuth2RefreshToken;
-use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterface
 {
@@ -53,7 +52,7 @@ class RefreshTokenStorage extends AbstractStorage implements RefreshTokenInterfa
             }
             return $token;
         }
-        return;
+        return null;
     }
 
     /**

@@ -31,7 +31,6 @@ namespace Themes\RestApiTheme\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
 use Themes\RestApiTheme\AbstractEntities\AbstractValuedEntity;
-use Themes\RestApiTheme\Entities\OAuth2AccessToken;
 
 /**
  * OAuth2RefreshToken store all information about auth code.
@@ -49,7 +48,7 @@ class OAuth2RefreshToken extends AbstractValuedEntity
     private $accessToken = null;
 
     /**
-     * @return Themes\RestApiTheme\Entities\OAuth2AccessToken
+     * @return OAuth2AccessToken
      */
     public function getAccessToken()
     {
@@ -57,7 +56,7 @@ class OAuth2RefreshToken extends AbstractValuedEntity
     }
 
     /**
-     * @param Themes\RestApiTheme\Entities\OAuth2AccessToken $accessToken
+     * @param OAuth2AccessToken $accessToken
      *
      * @return $this
      */

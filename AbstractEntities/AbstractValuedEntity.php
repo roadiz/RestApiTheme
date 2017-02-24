@@ -66,12 +66,12 @@ abstract class AbstractValuedEntity extends AbstractEntity
 
     /**
      * @ORM\Column(name="expire_time", type="datetime", nullable=true)
-     * @var DateTime
+     * @var \DateTime
      */
     private $expireTime;
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
     public function getExpireTime()
     {
@@ -79,7 +79,7 @@ abstract class AbstractValuedEntity extends AbstractEntity
     }
 
     /**
-     * @param DateTime $expireTime
+     * @param \DateTime $expireTime
      *
      * @return $this
      */

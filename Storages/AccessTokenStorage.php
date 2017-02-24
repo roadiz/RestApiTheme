@@ -34,7 +34,6 @@ use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AccessTokenInterface;
 use Themes\RestApiTheme\Entities\OAuth2AccessToken;
-use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
 {
@@ -51,7 +50,7 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
                 ->setExpireTime($result->getExpireTime()->getTimestamp());
             return $token;
         }
-        return;
+        return null;
     }
 
     /**

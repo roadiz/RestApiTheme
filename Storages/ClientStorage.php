@@ -32,8 +32,6 @@ namespace Themes\RestApiTheme\Storages;
 use League\OAuth2\Server\Entity\ClientEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
 use League\OAuth2\Server\Storage\ClientInterface;
-use Themes\RestApiTheme\Entities\OAuth2Client;
-use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class ClientStorage extends AbstractStorage implements ClientInterface
 {
@@ -61,7 +59,8 @@ class ClientStorage extends AbstractStorage implements ClientInterface
             ]);
             return $client;
         }
-        return;
+
+        return null;
     }
     /**
      * {@inheritdoc}
@@ -78,6 +77,6 @@ class ClientStorage extends AbstractStorage implements ClientInterface
             ]);
             return $client;
         }
-        return;
+        return null;
     }
 }

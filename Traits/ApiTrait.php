@@ -29,6 +29,9 @@
  */
 namespace Themes\RestApiTheme\Traits;
 
+use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\Grant\AuthCodeGrant;
+use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Themes\RestApiTheme\Storages;
 
@@ -36,22 +39,22 @@ trait ApiTrait
 {
     protected $server;
     protected $authCodeGrant;
-    protected $refrehTokenGrant;
+    protected $refreshTokenGrant;
 
     public function prepareApiServer()
     {
         // Set up the OAuth 2.0 authorization server
-        $this->server = new \League\OAuth2\Server\AuthorizationServer();
-        $this->server->setSessionStorage(new Storages\SessionStorage($this->getService('em'), $this->getService('logger')));
-        $this->server->setAccessTokenStorage(new Storages\AccessTokenStorage($this->getService('em'), $this->getService('logger')));
-        $this->server->setRefreshTokenStorage(new Storages\RefreshTokenStorage($this->getService('em'), $this->getService('logger')));
-        $this->server->setClientStorage(new Storages\ClientStorage($this->getService('em'), $this->getService('logger')));
-        $this->server->setScopeStorage(new Storages\ScopeStorage($this->getService('em'), $this->getService('logger')));
-        $this->server->setAuthCodeStorage(new Storages\AuthCodeStorage($this->getService('em'), $this->getService('logger')));
+        $this->server = new AuthorizationServer();
+        $this->server->setSessionStorage(new Storages\SessionStorage($this->get('em'), $this->get('logger')));
+        $this->server->setAccessTokenStorage(new Storages\AccessTokenStorage($this->get('em'), $this->get('logger')));
+        $this->server->setRefreshTokenStorage(new Storages\RefreshTokenStorage($this->get('em'), $this->get('logger')));
+        $this->server->setClientStorage(new Storages\ClientStorage($this->get('em'), $this->get('logger')));
+        $this->server->setScopeStorage(new Storages\ScopeStorage($this->get('em'), $this->get('logger')));
+        $this->server->setAuthCodeStorage(new Storages\AuthCodeStorage($this->get('em'), $this->get('logger')));
 
-        $this->authCodeGrant = new \League\OAuth2\Server\Grant\AuthCodeGrant();
+        $this->authCodeGrant = new AuthCodeGrant();
         $this->server->addGrantType($this->authCodeGrant);
-        $this->refreshTokenGrant = new \League\OAuth2\Server\Grant\RefreshTokenGrant();
+        $this->refreshTokenGrant = new RefreshTokenGrant();
         $this->server->addGrantType($this->refreshTokenGrant);
     }
 

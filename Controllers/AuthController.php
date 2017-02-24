@@ -29,14 +29,19 @@
  */
 namespace Themes\RestApiTheme\Controllers;
 
+use Doctrine\ORM\ORMException;
+use League\OAuth2\Server\Exception\AccessDeniedException;
+use League\OAuth2\Server\Exception\OAuthException;
+use League\OAuth2\Server\Util\RedirectUri;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Themes\RestApiTheme\Traits\ApiTrait;
 use Themes\Rozier\RozierApp;
 
 class AuthController extends RozierApp
 {
-    use \Themes\RestApiTheme\Traits\ApiTrait;
+    use ApiTrait;
 
     public function oauthAction(Request $request)
     {
@@ -54,7 +59,7 @@ class AuthController extends RozierApp
 
         try {
             $authParams = $this->server->getGrantType('authorization_code')->checkAuthorizeParams();
-        } catch (\Exception $e) {
+        } catch (OAuthException $e) {
             if ($e->shouldRedirect()) {
                 // Everything is okay, save $authParams to the a session and redirect the user to sign-in
                 $reponse = new RedirectResponse(
@@ -66,7 +71,7 @@ class AuthController extends RozierApp
                 return $reponse;
             }
 
-            $this->getService("logger")->warning($e->getMessage());
+            $this->get("logger")->warning($e->getMessage());
 
             return $this->sendJson($e->httpStatusCode,
                 [
@@ -76,10 +81,10 @@ class AuthController extends RozierApp
         }
 
         // Everything is okay, save $authParams to the a session and redirect the user to sign-in
-        $session = $this->getService('session');
+        $session = $this->get('session');
         $session->set('authParams', $authParams);
         $response = new RedirectResponse(
-            $this->getService('urlGenerator')->generate(
+            $this->get('urlGenerator')->generate(
                 'signInPage'
             )
         );
@@ -91,22 +96,21 @@ class AuthController extends RozierApp
 
     public function authorizeAction(Request $request)
     {
-
         $this->prepareApiServer();
         $user = $this->getUser();
 
-        $session = $this->getService('session');
+        $session = $this->get('session');
         $authParams = $session->get('authParams');
-        $builder = $this->getService('formFactory')
-                        ->createBuilder()
-                        ->add('approve', 'submit', [
-                            'attr' => ['class' => 'uk-button uk-button-primary'],
-                            'label' => $this->getTranslator()->trans('api.scope.approve'),
-                        ])
-                        ->add('cancel', 'submit', [
-                            'attr' => ['class' => 'uk-button'],
-                            'label' => $this->getTranslator()->trans('api.scope.cancel'),
-                        ]);
+        $builder = $this->get('formFactory')
+            ->createBuilder()
+            ->add('approve', 'submit', [
+                'attr' => ['class' => 'uk-button uk-button-primary'],
+                'label' => $this->getTranslator()->trans('api.scope.approve'),
+            ])
+            ->add('cancel', 'submit', [
+                'attr' => ['class' => 'uk-button'],
+                'label' => $this->getTranslator()->trans('api.scope.cancel'),
+            ]);
 
         $form = $builder->getForm();
         $form->handleRequest($request);
@@ -114,7 +118,7 @@ class AuthController extends RozierApp
         if ($form->isValid()) {
             if ($form->get("approve")->isClicked()) {
                 $redirectUri = $this->server->getGrantType('authorization_code')
-                                            ->newAuthorizeRequest('user', $user->getId(), $authParams);
+                    ->newAuthorizeRequest('user', $user->getId(), $authParams);
 
                 $response = new RedirectResponse(
                     $redirectUri
@@ -123,11 +127,11 @@ class AuthController extends RozierApp
                 $response->setStatusCode(Response::HTTP_OK);
 
             } else {
-                $error = new \League\OAuth2\Server\Util\AccessDeniedException;
+                $error = new AccessDeniedException();
 
-                $this->getService("logger")->warning($error->getMessage());
+                $this->get("logger")->warning($error->getMessage());
 
-                $redirectUri = new \League\OAuth2\Server\Util\RedirectUri(
+                $redirectUri = new RedirectUri(
                     $authParams['redirect_uri'],
                     [
                         'error' => $error->errorType,
@@ -169,20 +173,20 @@ class AuthController extends RozierApp
             $response = $this->server->issueAccessToken();
             return $this->sendJson(Response::HTTP_OK, $response);
 
-        } catch (\Doctrine\ORM\ORMException $e) {
+        } catch (ORMException $e) {
             return $this->sendJson(Response::HTTP_INTERNAL_SERVER_ERROR, [
-                'error'     =>  '\Doctrine\ORM\ORMException',
-                'message'   =>  $e->getMessage()
+                'error' => '\Doctrine\ORM\ORMException',
+                'message' => $e->getMessage()
             ]);
-        } catch (\League\OAuth2\Server\Exception\OAuthException $e) {
+        } catch (OAuthException $e) {
             return $this->sendJson($e->httpStatusCode, [
-                'error'     =>  $e->errorType,
-                'message'   =>  $e->getMessage()
+                'error' => $e->errorType,
+                'message' => $e->getMessage()
             ]);
         } catch (\Exception $e) {
             return $this->sendJson(Response::HTTP_INTERNAL_SERVER_ERROR, [
-                'error'     =>  'General exception',
-                'message'   =>  $e->getMessage()
+                'error' => 'General exception',
+                'message' => $e->getMessage()
             ]);
         }
     }

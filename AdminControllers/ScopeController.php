@@ -2,36 +2,29 @@
 
 namespace Themes\RestApiTheme\AdminControllers;
 
-use Themes\Rozier\RozierApp;
-
-use Themes\RestApiTheme\Entities\OAuth2Scope;
-
-use RZ\Roadiz\Core\ListManagers\EntityListManager;
-use RZ\Roadiz\Utils\StringHandler;
-use RZ\Roadiz\Utils\Security\PasswordGenerator;
-
 use RZ\Roadiz\Core\Exceptions\EntityAlreadyExistsException;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use RZ\Roadiz\Core\ListManagers\EntityListManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Themes\RestApiTheme\Entities\OAuth2Scope;
+use Themes\RestApiTheme\RestApiThemeApp;
+use Themes\Rozier\RozierApp;
 
 class ScopeController extends RozierApp
 {
-
     public function listAction(
         Request $request
-    ) {
+    )
+    {
 
         $listManager = new EntityListManager(
             $request,
-            $this->getService("em"),
+            $this->get("em"),
             "Themes\RestApiTheme\Entities\OAuth2Scope",
             [],
             array(
-              "id" => "DESC"
+                "id" => "DESC"
             )
         );
 
@@ -40,24 +33,18 @@ class ScopeController extends RozierApp
         $this->assignation['filters'] = $listManager->getAssignation();
         $this->assignation['scopes'] = $listManager->getEntities();
 
-        //$this->getService('stopwatch')->start('twigRender');
-
-        return $this->render('admin/scope/list.html.twig', $this->assignation, null,
-                             \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/scope/list.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     /**
      * Handle scope creation pages.
      *
-     * @param Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return Symfony\Component\HttpFoundation\Response
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function addAction(Request $request)
     {
-        //$this->validateAccessForRole('ROLE_ACCESS_NEWS');
-
-        $form = $this->getService('formFactory')
+        $form = $this->get('formFactory')
             ->createBuilder()
             ->add(
                 'name',
@@ -88,12 +75,12 @@ class ScopeController extends RozierApp
 
                 $msg = $this->getTranslator()->trans(
                     'oauth.scope.%name%.created',
-                    array('%name%'=>$scope->getName())
+                    array('%name%' => $scope->getName())
                 );
                 $this->publishConfirmMessage($request, $msg);
 
                 $response = new RedirectResponse(
-                    $this->getService('urlGenerator')->generate(
+                    $this->get('urlGenerator')->generate(
                         'scopeAdminListPage'
                     )
                 );
@@ -104,7 +91,7 @@ class ScopeController extends RozierApp
                 $this->publishErrorMessage($request, $e->getMessage());
 
                 $response = new RedirectResponse(
-                    $this->getService('urlGenerator')->generate(
+                    $this->get('urlGenerator')->generate(
                         'scopeAdminAddPage'
                     )
                 );
@@ -116,9 +103,7 @@ class ScopeController extends RozierApp
 
         $this->assignation['form'] = $form->createView();
 
-        return
-            $this->render('admin/scope/add.html.twig', $this->assignation, null,
-                          \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/scope/add.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     private function createScope($data)
@@ -127,20 +112,19 @@ class ScopeController extends RozierApp
         $scope->setName($data["name"]);
         $scope->setDescription($data["description"]);
 
-        $this->getService("em")->persist($scope);
-        $this->getService("em")->flush();
+        $this->get("em")->persist($scope);
+        $this->get("em")->flush();
         return $scope;
     }
 
     public function editAction(Request $request, $scopeId)
     {
-        //$this->validateAccessForRole('ROLE_ACCESS_NEWS');
 
-        $scope =  $this->getService("em")->find("Themes\RestApiTheme\Entities\OAuth2Scope", $scopeId);
+        $scope = $this->get("em")->find("Themes\RestApiTheme\Entities\OAuth2Scope", $scopeId);
         if ($scope === null) {
             return $this->throw404();
         }
-        $form = $this->getService('formFactory')
+        $form = $this->get('formFactory')
             ->createBuilder()
             ->add(
                 'name',
@@ -173,17 +157,17 @@ class ScopeController extends RozierApp
             $scope->setName($data['name']);
             $scope->setDescription($data['description']);
 
-            $this->getService('em')->flush();
+            $this->get('em')->flush();
 
             $msg = $this->getTranslator()->trans(
                 'scope.%name%.updated',
-                array('%name%'=>$scope->getName())
+                array('%name%' => $scope->getName())
             );
 
             $this->publishConfirmMessage($request, $msg);
 
             $response = new RedirectResponse(
-                $this->getService('urlGenerator')->generate(
+                $this->get('urlGenerator')->generate(
                     'scopeAdminListPage'
                 )
             );
@@ -195,24 +179,20 @@ class ScopeController extends RozierApp
         $this->assignation['form'] = $form->createView();
         $this->assignation['scope'] = $scope;
 
-        return $this->render('admin/scope/edit.html.twig', $this->assignation, null,
-                             \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/scope/edit.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     /**
      * Return an deletion form for requested scope.
      *
-     * @param Symfony\Component\HttpFoundation\Request $request
-     * @param int                                      $scopeId
-     *
-     * @return Symfony\Component\HttpFoundation\Response
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param int $scopeId
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteAction(Request $request, $scopeId)
     {
-        //$this->validateAccessForRole('ROLE_ACCESS_NEWS_DELETE');
-
-        $scope = $this->getService('em')
-            ->find('Themes\RestApiTheme\Entities\OAuth2Scope', (int) $scopeId);
+        $scope = $this->get('em')
+            ->find('Themes\RestApiTheme\Entities\OAuth2Scope', (int)$scopeId);
 
         if ($scope === null) {
             return $this->throw404();
@@ -222,19 +202,20 @@ class ScopeController extends RozierApp
         $form->handleRequest($request);
 
         if ($form->isValid() &&
-            $form->getData()['scopeId'] == $scope->getId()) {
-            $this->getService('em')->remove($scope);
-            $this->getService('em')->flush();
+            $form->getData()['scopeId'] == $scope->getId()
+        ) {
+            $this->get('em')->remove($scope);
+            $this->get('em')->flush();
             $msg = $this->getTranslator()->trans(
                 'scope.%name%.deleted',
-                array('%name%'=>$scope->getName())
+                array('%name%' => $scope->getName())
             );
             $this->publishConfirmMessage($request, $msg);
             /*
              * Force redirect to avoid resending form when refreshing page
              */
             $response = new RedirectResponse(
-                $this->getService('urlGenerator')->generate('scopeAdminListPage')
+                $this->get('urlGenerator')->generate('scopeAdminListPage')
             );
             $response->prepare($request);
 
@@ -243,18 +224,16 @@ class ScopeController extends RozierApp
 
         $this->assignation['form'] = $form->createView();
 
-        return $this->render('admin/scope/delete.html.twig', $this->assignation, null,
-                             \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/scope/delete.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     /**
-     * @param RZ\Roadiz\Core\Entities\Node $node
-     *
+     * @param OAuth2Scope $scope
      * @return \Symfony\Component\Form\Form
      */
     protected function buildDeleteForm(OAuth2Scope $scope)
     {
-        $builder = $this->getService('formFactory')
+        $builder = $this->get('formFactory')
             ->createBuilder('form')
             ->add('scopeId', 'hidden', array(
                 'data' => $scope->getId(),

@@ -32,7 +32,6 @@ namespace Themes\RestApiTheme\Storages;
 
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\ScopeInterface;
-use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class ScopeStorage extends AbstractStorage implements ScopeInterface
 {
@@ -50,7 +49,6 @@ class ScopeStorage extends AbstractStorage implements ScopeInterface
                 'description' => $result->getDescription(),
             ]);
         }
-        return;
+        return null;
     }
-
 }

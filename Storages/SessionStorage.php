@@ -35,9 +35,9 @@ use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
 use League\OAuth2\Server\Storage\SessionInterface;
+use RZ\Roadiz\Core\Entities\User;
 use Themes\RestApiTheme\Entities\OAuth2ClientSession;
 use Themes\RestApiTheme\Entities\OAuth2UserSession;
-use Themes\RestApiTheme\Storages\AbstractStorage;
 
 class SessionStorage extends AbstractStorage implements SessionInterface
 {
@@ -55,7 +55,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
             $session->setOwner($type, $result->getSession()->getOwner()->getId());
             return $session;
         }
-        return;
+        return null;
     }
 
     /**
@@ -72,7 +72,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
             $session->setOwner($type, $result->getSession()->getOwner()->getId());
             return $session;
         }
-        return;
+        return null;
     }
 
     /**
@@ -113,6 +113,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
             }
 
         } else {
+            /** @var User $owner */
             $owner = $this->em->find("RZ\Roadiz\Core\Entities\User", $ownerId);
             $session = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2UserSession")
                             ->findOneBy(['owner' => $owner, 'client' => $client]);

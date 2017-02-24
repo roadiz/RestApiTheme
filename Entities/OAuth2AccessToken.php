@@ -32,8 +32,6 @@ namespace Themes\RestApiTheme\Entities;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Themes\RestApiTheme\AbstractEntities\AbstractValuedEntity;
-use Themes\RestApiTheme\Entities\OAuth2Scope;
-use Themes\RestApiTheme\Entities\OAuth2Session;
 
 /**
  * OAuth2AccessToken store all information about access token.
@@ -49,7 +47,7 @@ class OAuth2AccessToken extends AbstractValuedEntity
     private $refreshToken = null;
 
     /**
-     * @return Themes\RestApiTheme\Entities\OAuth2RefreshToken
+     * @return OAuth2RefreshToken
      */
     public function getRefreshToken()
     {
@@ -63,7 +61,7 @@ class OAuth2AccessToken extends AbstractValuedEntity
     private $session = null;
 
     /**
-     * @return Themes\RestApiTheme\Entities\OAuth2Session
+     * @return OAuth2Session
      */
     public function getSession()
     {
@@ -71,7 +69,7 @@ class OAuth2AccessToken extends AbstractValuedEntity
     }
 
     /**
-     * @param Themes\RestApiTheme\Entities\OAuth2Session $session
+     * @param OAuth2Session $session
      *
      * @return $this
      */

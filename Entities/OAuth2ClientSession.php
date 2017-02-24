@@ -47,7 +47,7 @@ class OAuth2ClientSession extends OAuth2Session
     private $owner;
 
     /**
-     * @return Themes\RestApiTheme\Entities\OAuth2Client
+     * @return OAuth2Client
      */
 
     public function getOwner() {
@@ -55,7 +55,7 @@ class OAuth2ClientSession extends OAuth2Session
     }
 
     /**
-     * @param Themes\RestApiTheme\Entities\OAuth2Client $owner
+     * @param OAuth2Client $owner
      *
      * @return $this
      */

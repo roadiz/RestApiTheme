@@ -47,7 +47,7 @@ class OAuth2UserSession extends OAuth2Session
     private $owner;
 
     /**
-     * @return RZ\Roadiz\Core\Entities\User
+     * @return \RZ\Roadiz\Core\Entities\User
      */
 
     public function getOwner() {
@@ -55,7 +55,7 @@ class OAuth2UserSession extends OAuth2Session
     }
 
     /**
-     * @param RZ\Roadiz\Core\Entities\User $owner
+     * @param \RZ\Roadiz\Core\Entities\User $owner
      *
      * @return $this
      */
@@ -63,5 +63,4 @@ class OAuth2UserSession extends OAuth2Session
         $this->owner = $owner;
         return $this;
     }
-
 }

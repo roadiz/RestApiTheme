@@ -32,8 +32,6 @@ namespace Themes\RestApiTheme\Entities;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Themes\RestApiTheme\AbstractEntities\AbstractValuedEntity;
-use Themes\RestApiTheme\Entities\OAuth2Scope;
-use Themes\RestApiTheme\Entities\OAuth2Session;
 
 /**
  * OAuth2AuthCode store all information about auth code.
@@ -50,7 +48,7 @@ class OAuth2AuthCode extends AbstractValuedEntity
     private $session;
 
     /**
-     * @return Themes\RestApiTheme\Entities\OAuth2Session
+     * @return OAuth2Session
      */
     public function getSession()
     {
@@ -58,7 +56,7 @@ class OAuth2AuthCode extends AbstractValuedEntity
     }
 
     /**
-     * @param Themes\RestApiTheme\Entities\OAuth2Session $session
+     * @param OAuth2Session $session
      *
      * @return $this
      */
