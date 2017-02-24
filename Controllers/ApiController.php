@@ -24,23 +24,30 @@
  * be used in advertising or otherwise to promote the sale, use or other dealings
  * in this Software without prior written authorization from Ambroise Maupate and Julien Blanchet.
  *
- * @file ApiTrait.php
+ * @file ApiController.php
  * @author Maxime Constantinian
  */
-namespace Themes\RestApiTheme\Traits;
+namespace Themes\RestApiTheme\Controllers;
 
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Themes\RestApiTheme\Storages;
+use Themes\Rozier\RozierApp;
 
-trait ApiTrait
+class ApiController extends RozierApp
 {
+    /**
+     * @var AuthorizationServer
+     */
     protected $server;
     protected $authCodeGrant;
     protected $refreshTokenGrant;
 
+    /**
+     * Prepare authorization server
+     */
     public function prepareApiServer()
     {
         // Set up the OAuth 2.0 authorization server
@@ -58,6 +65,11 @@ trait ApiTrait
         $this->server->addGrantType($this->refreshTokenGrant);
     }
 
+    /**
+     * @param int $statusCode
+     * @param array $data
+     * @return JsonResponse
+     */
     public function sendJson($statusCode, $data)
     {
         $response = new JsonResponse();

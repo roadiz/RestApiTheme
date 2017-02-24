@@ -32,6 +32,8 @@ namespace Themes\RestApiTheme\Storages;
 use League\OAuth2\Server\Entity\ClientEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
 use League\OAuth2\Server\Storage\ClientInterface;
+use Themes\RestApiTheme\Entities\OAuth2Client;
+use Themes\RestApiTheme\Entities\OAuth2Session;
 
 class ClientStorage extends AbstractStorage implements ClientInterface
 {
@@ -49,8 +51,9 @@ class ClientStorage extends AbstractStorage implements ClientInterface
             $queryArray["redirectUri"] = $redirectUri;
         }
 
-        $result = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2Client")
-                       ->findOneBy($queryArray);
+        /** @var OAuth2Client $result */
+        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Client')->findOneBy($queryArray);
+
         if ($result !== null) {
             $client = new ClientEntity($this->server);
             $client->hydrate([
@@ -67,13 +70,13 @@ class ClientStorage extends AbstractStorage implements ClientInterface
      */
     public function getBySession(SessionEntity $session)
     {
-        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Session')
-                       ->findOne($session->getId());
+        /** @var OAuth2Session $result */
+        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Session')->find($session->getId());
         if ($result !== null) {
             $client = new ClientEntity($this->server);
             $client->hydrate([
-                'id' => $result->getClientId(),
-                'name' => $result->getName(),
+                'id' => $result->getClient()->getClientId(),
+                'name' => $result->getClient()->getName(),
             ]);
             return $client;
         }

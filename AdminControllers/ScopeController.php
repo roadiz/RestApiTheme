@@ -117,10 +117,15 @@ class ScopeController extends RozierApp
         return $scope;
     }
 
+    /**
+     * @param Request $request
+     * @param $scopeId
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction(Request $request, $scopeId)
     {
-
-        $scope = $this->get("em")->find("Themes\RestApiTheme\Entities\OAuth2Scope", $scopeId);
+        /** @var OAuth2Scope $scope */
+        $scope = $this->get("em")->find('Themes\RestApiTheme\Entities\OAuth2Scope', $scopeId);
         if ($scope === null) {
             return $this->throw404();
         }
@@ -141,7 +146,7 @@ class ScopeController extends RozierApp
                 'description',
                 'text',
                 array(
-                    'data' => $scope->getRedirectUri(),
+                    'data' => $scope->getDescription(),
                     'label' => $this->getTranslator()->trans('description'),
                     'constraints' => array(
                         new NotBlank()

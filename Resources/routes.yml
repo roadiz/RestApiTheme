@@ -19,4 +19,6 @@ authorizeScopePage:
 
 accessTokenPage:
     path: /access_token
+    methods:
+      - POST
     defaults: { _controller: Themes\RestApiTheme\Controllers\AuthController::accessTokenAction}

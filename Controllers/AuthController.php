@@ -36,13 +36,13 @@ use League\OAuth2\Server\Util\RedirectUri;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Themes\RestApiTheme\Traits\ApiTrait;
-use Themes\Rozier\RozierApp;
 
-class AuthController extends RozierApp
+class AuthController extends ApiController
 {
-    use ApiTrait;
-
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
+     */
     public function oauthAction(Request $request)
     {
         $method = $request->getMethod();
@@ -62,13 +62,13 @@ class AuthController extends RozierApp
         } catch (OAuthException $e) {
             if ($e->shouldRedirect()) {
                 // Everything is okay, save $authParams to the a session and redirect the user to sign-in
-                $reponse = new RedirectResponse(
+                $response = new RedirectResponse(
                     $e->getRedirectUri()
                 );
 
-                $reponse->setStatusCode(Response::HTTP_FOUND);
+                $response->setStatusCode(Response::HTTP_FOUND);
 
-                return $reponse;
+                return $response;
             }
 
             $this->get("logger")->warning($e->getMessage());
@@ -94,6 +94,10 @@ class AuthController extends RozierApp
         return $response;
     }
 
+    /**
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
     public function authorizeAction(Request $request)
     {
         $this->prepareApiServer();
@@ -152,9 +156,13 @@ class AuthController extends RozierApp
         $this->assignation['scopes'] = $authParams['scopes'];
         $this->assignation['form'] = $form->createView();
 
-        return $this->render('scopeValidate.html.twig', $this->assignation);
+        return $this->render('scopeValidate.html.twig', $this->assignation, null, 'RestApiTheme');
     }
 
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function accessTokenAction(Request $request)
     {
         $method = $request->getMethod();

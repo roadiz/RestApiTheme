@@ -38,19 +38,19 @@ class RestApiThemeApp extends FrontendController
                 'name' => 'Manage API',
                 'path' => null,
                 'icon' => 'uk-icon-file-text-o',
-                'roles' => null,//array('ROLE_ACCESS_NEWS', 'ROLE_ACCESS_NEWS_DELETE'),
+                'roles' => null,
                 'subentries' => [
                     'clientList' => [
                         'name' => 'api.list.client',
                         'path' => $urlGenerator->generate('clientAdminListPage'),
                         'icon' => 'uk-icon-file-text-o',
-                        'roles' => null//array('ROLE_ACCESS_NEWS')
+                        'roles' => null
                     ],
                     'scopeList' => [
                         'name' => 'api.list.scope',
                         'path' => $urlGenerator->generate('scopeAdminListPage'),
                         'icon' => 'uk-icon-file-text-o',
-                        'roles' => null//array('ROLE_ACCESS_NEWS')
+                        'roles' => null
                     ]
                 ]
             ];

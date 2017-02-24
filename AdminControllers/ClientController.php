@@ -36,6 +36,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Themes\RestApiTheme\Entities\OAuth2Client;
+use Themes\RestApiTheme\RestApiThemeApp;
 use Themes\Rozier\RozierApp;
 
 class ClientController extends RozierApp
@@ -58,8 +59,7 @@ class ClientController extends RozierApp
         $this->assignation['filters'] = $listManager->getAssignation();
         $this->assignation['clients'] = $listManager->getEntities();
 
-        return $this->render('admin/client/list.html.twig', $this->assignation, null,
-                             \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/client/list.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     /**
@@ -128,9 +128,7 @@ class ClientController extends RozierApp
 
         $this->assignation['form'] = $form->createView();
 
-        return
-            $this->render('admin/client/add.html.twig', $this->assignation, null,
-                          \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/client/add.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     private function createClient($data)
@@ -207,8 +205,7 @@ class ClientController extends RozierApp
         $this->assignation['form'] = $form->createView();
         $this->assignation['client'] = $client;
 
-        return $this->render('admin/client/edit.html.twig', $this->assignation, null,
-                             \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/client/edit.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     /**
@@ -254,8 +251,7 @@ class ClientController extends RozierApp
 
         $this->assignation['form'] = $form->createView();
 
-        return $this->render('admin/client/delete.html.twig', $this->assignation, null,
-                             \Themes\RestApiTheme\RestApiThemeApp::getThemeDir());
+        return $this->render('admin/client/delete.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
     }
 
     /**

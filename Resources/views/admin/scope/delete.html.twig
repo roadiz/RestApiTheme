@@ -5,7 +5,7 @@
 
 	<header class="content-header header-scope header-scope-delete">
         <h1 class="content-title node-delete-title">{{ "delete.scope.%name%"|trans({'%name%': scope.name})|truncate(25, true, '[…]') }}</h1>
-		{% include 'nodes/navBack.html.twig' %}
+        {% include '@RestApiTheme/admin/scope/navBack.html.twig' %}
     </header>
 
 	<article class="content content-delete content-scope-delete content-no-action-menu">
