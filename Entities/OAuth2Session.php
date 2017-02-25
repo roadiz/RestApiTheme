@@ -33,6 +33,7 @@ namespace Themes\RestApiTheme\Entities;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
+use RZ\Roadiz\Core\Entities\User;
 
 /**
  * OAuth2Session store all information about OAuth2 scope.
@@ -48,7 +49,9 @@ use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
  */
 abstract class OAuth2Session extends AbstractEntity
 {
-
+    /**
+     * @return OAuth2Client|User
+     */
     abstract public function getOwner();
 
     /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2014, Ambroise Maupate and Julien Blanchet
+ * Copyright (c) 2017. Ambroise Maupate and Julien Blanchet
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -8,7 +8,6 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is furnished
  * to do so, subject to the following conditions:
- *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -24,43 +23,42 @@
  * be used in advertising or otherwise to promote the sale, use or other dealings
  * in this Software without prior written authorization from Ambroise Maupate and Julien Blanchet.
  *
- * @file OAuth2Session.php
- * @author Maxime Constantinian
+ * @file TokenInfoController.php
+ * @author Ambroise Maupate <ambroise@rezo-zero.com>
  */
+namespace Themes\RestApiTheme\Controllers;
 
-namespace Themes\RestApiTheme\Entities;
+use League\OAuth2\Server\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * OAuth2Session store all information about OAuth2 scope.
- *
- * @ORM\Entity(repositoryClass="RZ\Roadiz\Core\Repositories\EntityRepository")
- * @ORM\Table(name="oauth_session_client")
- */
-class OAuth2ClientSession extends OAuth2Session
+class TokenInfoController extends ApiController
 {
     /**
-     * @ORM\ManyToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Client")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
-    private $owner;
-
-    /**
-     * @return OAuth2Client
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function getOwner() {
-        return $this->owner;
-    }
+    public function defaultAction()
+    {
+        $this->prepareResourceServer();
+        // Check that access token is present
+        try {
+            $this->server->isValidRequest(false);
+        } catch (AccessDeniedException $e) {
+            return $this->json([
+                'error' => $e->errorType,
+                'error_description' => $e->getMessage(),
+                'error_uri' => ''
+            ], JsonResponse::HTTP_FORBIDDEN);
+        }
 
-    /**
-     * @param OAuth2Client $owner
-     *
-     * @return $this
-     */
-    public function setOwner($owner) {
-        $this->owner = $owner;
-        return $this;
-    }
+        $accessToken = $this->server->getAccessToken();
+        $session = $this->server->getSessionStorage()->getByAccessToken($accessToken);
 
+        return $this->json([
+            'owner_id' => $session->getOwnerId(),
+            'owner_type' => $session->getOwnerType(),
+            'access_token' => $accessToken,
+            'client_id' => $session->getClient()->getId(),
+            'scopes' => $accessToken->getScopes(),
+        ]);
+    }
 }

@@ -3,7 +3,7 @@
  * Copyright © 2014, Ambroise Maupate and Julien Blanchet
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the 'Software'), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is furnished
@@ -36,6 +36,8 @@ use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
 use League\OAuth2\Server\Storage\SessionInterface;
 use RZ\Roadiz\Core\Entities\User;
+use Themes\RestApiTheme\Entities\OAuth2AuthCode;
+use Themes\RestApiTheme\Entities\OAuth2Client;
 use Themes\RestApiTheme\Entities\OAuth2ClientSession;
 use Themes\RestApiTheme\Entities\OAuth2UserSession;
 
@@ -46,12 +48,12 @@ class SessionStorage extends AbstractStorage implements SessionInterface
      */
     public function getByAccessToken(AccessTokenEntity $accessToken)
     {
-        $result = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
+        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
                        ->findOneByValue($accessToken->getId());
         if ($result !== null) {
             $session = new SessionEntity($this->server);
             $session->setId($result->getSession()->getId());
-            $type = (get_class($result->getSession()->getOwner()) == "Themes\RestApiTheme\Entities\OAuth2ClientSession") ? "client" : "user";
+            $type = (get_class($result->getSession()->getOwner()) == 'Themes\RestApiTheme\Entities\OAuth2ClientSession') ? 'client' : 'user';
             $session->setOwner($type, $result->getSession()->getOwner()->getId());
             return $session;
         }
@@ -63,12 +65,17 @@ class SessionStorage extends AbstractStorage implements SessionInterface
      */
     public function getByAuthCode(AuthCodeEntity $authCode)
     {
-        $result = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AuthCode")
+        /** @var OAuth2AuthCode|null $result */
+        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AuthCode')
                        ->findOneByValue($authCode->getId());
         if ($result !== null) {
             $session = new SessionEntity($this->server);
             $session->setId($result->getSession()->getId());
-            $type = (get_class($result->getSession()->getOwner()) == "Themes\RestApiTheme\Entities\OAuth2ClientSession") ? "client" : "user";
+            if ($result->getSession()->getOwner() instanceof OAuth2Client) {
+                $type = 'client';
+            } else {
+                $type = 'user';
+            }
             $session->setOwner($type, $result->getSession()->getOwner()->getId());
             return $session;
         }
@@ -80,7 +87,7 @@ class SessionStorage extends AbstractStorage implements SessionInterface
      */
     public function getScopes(SessionEntity $session)
     {
-        $session = $this->em->find("Themes\RestApiTheme\Entities\OAuth2Session", $session->getId());
+        $session = $this->em->find('Themes\RestApiTheme\Entities\OAuth2Session', $session->getId());
 
         $response = [];
         if ($session->getScopes()->count() > 0) {
@@ -100,34 +107,33 @@ class SessionStorage extends AbstractStorage implements SessionInterface
      */
     public function create($ownerType, $ownerId, $clientId, $clientRedirectUri = null)
     {
-        $client = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2Client")->findOneByClientId($clientId);
+        $client = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Client')->findOneByClientId($clientId);
 
-        if ($ownerType == "client") {
-            $owner = $this->em->find("Themes\RestApiTheme\Entities\OAuth2Client", $ownerId);
-            $session = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2Session")
-                            ->findOneBy(['owner' => $owner, 'client' => $client]);
+        if ($ownerType == 'client') {
+            $owner = $this->em->find('Themes\RestApiTheme\Entities\OAuth2Client', $ownerId);
+            $session = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Session')
+                            ->findOneBy([
+                                'client' => $client
+                            ]);
 
             if ($session === null) {
                 $session = new OAuth2ClientSession();
                 $this->em->persist($session);
             }
-
         } else {
             /** @var User $owner */
-            $owner = $this->em->find("RZ\Roadiz\Core\Entities\User", $ownerId);
-            $session = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2UserSession")
+            $owner = $this->em->find('RZ\Roadiz\Core\Entities\User', $ownerId);
+            $session = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2UserSession')
                             ->findOneBy(['owner' => $owner, 'client' => $client]);
 
             if ($session === null) {
                 $session = new OAuth2UserSession();
                 $this->em->persist($session);
             }
-
         }
 
         $session->setOwner($owner);
         $session->setClient($client);
-
         $this->em->flush();
 
         return $session->getId();
@@ -138,8 +144,8 @@ class SessionStorage extends AbstractStorage implements SessionInterface
      */
     public function associateScope(SessionEntity $session, ScopeEntity $scope)
     {
-        $session = $this->em->find("Themes\RestApiTheme\Entities\OAuth2Session", $session->getId());
-        $scope = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")->findOneByName($scope->getId());
+        $session = $this->em->find('Themes\RestApiTheme\Entities\OAuth2Session', $session->getId());
+        $scope = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Scope')->findOneByName($scope->getId());
 
         $session->addScope($scope);
 

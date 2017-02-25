@@ -33,6 +33,8 @@ use Doctrine\ORM\ORMException;
 use League\OAuth2\Server\Exception\AccessDeniedException;
 use League\OAuth2\Server\Exception\OAuthException;
 use League\OAuth2\Server\Util\RedirectUri;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,8 +53,10 @@ class AuthController extends ApiController
             case "GET":
                 break;
             default:
-                return $this->sendJson(Response::HTTP_METHOD_NOT_ALLOWED, ['error' => "Method not allowed.",
-                    "message" => 'Calling method ' . $method . ' is not allowed.']);
+                return $this->json([
+                    'error' => "Method not allowed.",
+                    "message" => 'Calling method ' . $method . ' is not allowed.'
+                ], Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $this->prepareApiServer();
@@ -61,35 +65,29 @@ class AuthController extends ApiController
             $authParams = $this->server->getGrantType('authorization_code')->checkAuthorizeParams();
         } catch (OAuthException $e) {
             if ($e->shouldRedirect()) {
-                // Everything is okay, save $authParams to the a session and redirect the user to sign-in
                 $response = new RedirectResponse(
                     $e->getRedirectUri()
                 );
-
-                $response->setStatusCode(Response::HTTP_FOUND);
-
+                $response->prepare($request);
                 return $response;
             }
 
             $this->get("logger")->warning($e->getMessage());
 
-            return $this->sendJson($e->httpStatusCode,
-                [
+            return $this->json([
                     'error' => $e->errorType,
                     'message' => $e->getMessage(),
-                ]);
+                ], $e->httpStatusCode);
         }
 
-        // Everything is okay, save $authParams to the a session and redirect the user to sign-in
-        $session = $this->get('session');
-        $session->set('authParams', $authParams);
         $response = new RedirectResponse(
-            $this->get('urlGenerator')->generate(
-                'signInPage'
-            )
+            $this->get('urlGenerator')->generate('signInPage', [
+                'client_id' => $authParams['client']->getId(),
+                'redirect_uri' => $authParams['redirect_uri'],
+                'response_type' => $authParams['response_type'],
+            ])
         );
 
-        $response->setStatusCode(Response::HTTP_FOUND);
         $response->prepare($request);
         return $response;
     }
@@ -100,14 +98,19 @@ class AuthController extends ApiController
      */
     public function authorizeAction(Request $request)
     {
+        $this->validateAccessForRole('ROLE_USER');
         $this->prepareApiServer();
         $user = $this->getUser();
 
-        $session = $this->get('session');
-        $authParams = $session->get('authParams');
-        $builder = $this->get('formFactory')
-            ->createBuilder()
-            ->add('approve', 'submit', [
+        $authParams = $this->server->getGrantType('authorization_code')->checkAuthorizeParams();
+        /** @var FormBuilder $builder */
+        $builder = $this->get('formFactory')->createBuilder();
+        $builder->setAction($this->get('urlGenerator')->generate('authorizeScopePage', [
+            'client_id' => $authParams['client']->getId(),
+            'redirect_uri' => $authParams['redirect_uri'],
+            'response_type' => $authParams['response_type'],
+        ]));
+        $builder->add('approve', 'submit', [
                 'attr' => ['class' => 'uk-button uk-button-primary'],
                 'label' => $this->getTranslator()->trans('api.scope.approve'),
             ])
@@ -115,26 +118,24 @@ class AuthController extends ApiController
                 'attr' => ['class' => 'uk-button'],
                 'label' => $this->getTranslator()->trans('api.scope.cancel'),
             ]);
-
+        /** @var Form $form */
         $form = $builder->getForm();
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             if ($form->get("approve")->isClicked()) {
-                $redirectUri = $this->server->getGrantType('authorization_code')
-                    ->newAuthorizeRequest('user', $user->getId(), $authParams);
+                $redirectUri = $this->server->getGrantType('authorization_code')->newAuthorizeRequest(
+                    'user',
+                    $user->getId(),
+                    $authParams
+                );
 
                 $response = new RedirectResponse(
                     $redirectUri
                 );
-
-                $response->setStatusCode(Response::HTTP_OK);
-
             } else {
                 $error = new AccessDeniedException();
-
                 $this->get("logger")->warning($error->getMessage());
-
                 $redirectUri = new RedirectUri(
                     $authParams['redirect_uri'],
                     [
@@ -165,37 +166,27 @@ class AuthController extends ApiController
      */
     public function accessTokenAction(Request $request)
     {
-        $method = $request->getMethod();
-
-        switch ($method) {
-            case "POST":
-                break;
-            default:
-                return $this->sendJson(Response::HTTP_METHOD_NOT_ALLOWED, ['error' => "Method not allowed.",
-                    "message" => 'Calling method ' . $method . ' is not allowed.']);
-        }
-
         $this->prepareApiServer();
 
         try {
             $response = $this->server->issueAccessToken();
-            return $this->sendJson(Response::HTTP_OK, $response);
+            return $this->json($response);
 
         } catch (ORMException $e) {
-            return $this->sendJson(Response::HTTP_INTERNAL_SERVER_ERROR, [
+            return $this->json([
                 'error' => '\Doctrine\ORM\ORMException',
-                'message' => $e->getMessage()
-            ]);
+                'error_description' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (OAuthException $e) {
-            return $this->sendJson($e->httpStatusCode, [
+            return $this->json([
                 'error' => $e->errorType,
-                'message' => $e->getMessage()
-            ]);
+                'error_description' => $e->getMessage()
+            ], $e->httpStatusCode);
         } catch (\Exception $e) {
-            return $this->sendJson(Response::HTTP_INTERNAL_SERVER_ERROR, [
+            return $this->json([
                 'error' => 'General exception',
-                'message' => $e->getMessage()
-            ]);
+                'error_description' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -31,7 +31,9 @@ namespace Themes\RestApiTheme\Controllers;
 
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
+use League\OAuth2\Server\Grant\ClientCredentialsGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
+use League\OAuth2\Server\ResourceServer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Themes\RestApiTheme\Storages;
 use Themes\Rozier\RozierApp;
@@ -39,11 +41,9 @@ use Themes\Rozier\RozierApp;
 class ApiController extends RozierApp
 {
     /**
-     * @var AuthorizationServer
+     * @var AuthorizationServer|ResourceServer
      */
     protected $server;
-    protected $authCodeGrant;
-    protected $refreshTokenGrant;
 
     /**
      * Prepare authorization server
@@ -52,25 +52,43 @@ class ApiController extends RozierApp
     {
         // Set up the OAuth 2.0 authorization server
         $this->server = new AuthorizationServer();
+        // Set access token TTL to 1 year
+        $this->server->setAccessTokenTTL(60*60*24*365.25);
+
         $this->server->setSessionStorage(new Storages\SessionStorage($this->get('em'), $this->get('logger')));
         $this->server->setAccessTokenStorage(new Storages\AccessTokenStorage($this->get('em'), $this->get('logger')));
-        $this->server->setRefreshTokenStorage(new Storages\RefreshTokenStorage($this->get('em'), $this->get('logger')));
         $this->server->setClientStorage(new Storages\ClientStorage($this->get('em'), $this->get('logger')));
         $this->server->setScopeStorage(new Storages\ScopeStorage($this->get('em'), $this->get('logger')));
+        $this->server->setRefreshTokenStorage(new Storages\RefreshTokenStorage($this->get('em'), $this->get('logger')));
         $this->server->setAuthCodeStorage(new Storages\AuthCodeStorage($this->get('em'), $this->get('logger')));
 
-        $this->authCodeGrant = new AuthCodeGrant();
-        $this->server->addGrantType($this->authCodeGrant);
-        $this->refreshTokenGrant = new RefreshTokenGrant();
-        $this->server->addGrantType($this->refreshTokenGrant);
+        $this->server->addGrantType(new AuthCodeGrant());
+        $this->server->addGrantType(new ClientCredentialsGrant());
+        $this->server->addGrantType(new RefreshTokenGrant());
     }
 
     /**
-     * @param int $statusCode
+     * Prepare resource server
+     */
+    public function prepareResourceServer()
+    {
+        // Set up the OAuth 2.0 resource server
+        $this->server = new ResourceServer(
+            new Storages\SessionStorage($this->get('em'), $this->get('logger')),
+            new Storages\AccessTokenStorage($this->get('em'), $this->get('logger')),
+            new Storages\ClientStorage($this->get('em'), $this->get('logger')),
+            new Storages\ScopeStorage($this->get('em'), $this->get('logger'))
+        );
+    }
+
+    /**
+     * Return a JsonResponse with given array data and optional status.
+     *
      * @param array $data
+     * @param int $statusCode Default: JsonResponse::HTTP_OK
      * @return JsonResponse
      */
-    public function sendJson($statusCode, $data)
+    public function json($data, $statusCode = JsonResponse::HTTP_OK)
     {
         $response = new JsonResponse();
         $response->setData($data);

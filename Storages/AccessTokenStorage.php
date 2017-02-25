@@ -3,7 +3,7 @@
  * Copyright © 2014, Ambroise Maupate and Julien Blanchet
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the 'Software'), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is furnished
@@ -42,8 +42,7 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function get($token)
     {
-        $result = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
-                       ->findOneByValue($token);
+        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')->findOneByValue($token);
         if ($result !== null) {
             $token = (new AccessTokenEntity($this->server))
                 ->setId($result->getValue())
@@ -58,8 +57,8 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function getScopes(AccessTokenEntity $token)
     {
-        $accessToken = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
-                            ->findOneByValue($token->getId());
+        $accessToken = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+            ->findOneByValue($token->getId());
 
         $response = [];
         if ($accessToken->getScopes()->count() > 0) {
@@ -79,7 +78,7 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function create($token, $expireTime, $sessionId)
     {
-        $session = $this->em->find("Themes\RestApiTheme\Entities\OAuth2Session", $sessionId);
+        $session = $this->em->find('Themes\RestApiTheme\Entities\OAuth2Session', $sessionId);
 
         if (null !== $session) {
             $accessToken = new OAuth2AccessToken();
@@ -99,10 +98,10 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function associateScope(AccessTokenEntity $token, ScopeEntity $scope)
     {
-        $accessToken = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
-                            ->findOneByValue($token->getId());
-        $scope = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2Scope")
-                      ->findOneByName($scope->getId());
+        $accessToken = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+            ->findOneByValue($token->getId());
+        $scope = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Scope')
+            ->findOneByName($scope->getId());
         $accessToken->addScope($scope);
 
         $this->em->flush();
@@ -113,8 +112,8 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function delete(AccessTokenEntity $token)
     {
-        $accessToken = $this->em->getRepository("Themes\RestApiTheme\Entities\OAuth2AccessToken")
-                            ->findOneByValue($token->getId());
+        $accessToken = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+            ->findOneByValue($token->getId());
         $this->logger->warning('Delete OAuth2AccessToken id#' . $accessToken->getId(), ['token' => $accessToken]);
         $this->em->remove($accessToken);
         $this->em->flush();

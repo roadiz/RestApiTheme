@@ -34,11 +34,11 @@ namespace Themes\RestApiTheme\Controllers;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Themes\Rozier\Controllers\LoginController;
 
-class ApiLoginController extends LoginController
+class ApiLoginController extends ApiController
 {
     /**
      * @param Request $request
@@ -46,25 +46,26 @@ class ApiLoginController extends LoginController
      */
     public function indexAction(Request $request)
     {
+        $this->prepareApiServer();
+        /** @var Session $session */
         $session = $this->get('session');
-        $authParams = $session->get('authParams');
+        $authParams = $this->server->getGrantType('authorization_code')->checkAuthorizeParams();
 
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
-
-            // Everything is okay, save $authParams to the a session and redirect the user to sign-in
-            $session->set('authParams', $authParams);
-
             $response = new RedirectResponse(
-                $this->get('urlGenerator')->generate('authorizeScopePage')
+                $this->get('urlGenerator')->generate('authorizeScopePage', [
+                    'client_id' => $authParams['client']->getId(),
+                    'redirect_uri' => $authParams['redirect_uri'],
+                    'response_type' => $authParams['response_type'],
+                ])
             );
 
-            $response->setStatusCode(302);
             $response->prepare($request);
             return $response;
 
         } else {
-            $form = $this->buildLoginForm();
 
+            $form = $this->buildLoginForm($authParams);
             $this->assignation['form'] = $form->createView();
 
             // get the login error if there is one
@@ -82,9 +83,10 @@ class ApiLoginController extends LoginController
     }
 
     /**
+     * @param array $authParams
      * @return \Symfony\Component\Form\Form
      */
-    private function buildLoginForm()
+    private function buildLoginForm(array $authParams)
     {
         $defaults = [];
 
@@ -103,7 +105,11 @@ class ApiLoginController extends LoginController
                 ],
             ])
             ->add('_target_path', 'hidden', [
-                'data' => $this->get('urlGenerator')->generate('authorizeScopePage')
+                'data' => $this->get('urlGenerator')->generate('authorizeScopePage', [
+                    'client_id' => $authParams['client']->getId(),
+                    'redirect_uri' => $authParams['redirect_uri'],
+                    'response_type' => $authParams['response_type'],
+                ])
             ]);
 
         return $builder->getForm();

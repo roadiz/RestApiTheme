@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2014, Ambroise Maupate and Julien Blanchet
+ * Copyright (c) 2017. Ambroise Maupate and Julien Blanchet
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -8,7 +8,6 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is furnished
  * to do so, subject to the following conditions:
- *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -25,7 +24,7 @@
  * in this Software without prior written authorization from Ambroise Maupate and Julien Blanchet.
  *
  * @file ClientController.php
- * @author Maxime Constantinian
+ * @author Ambroise Maupate <ambroise@rezo-zero.com>
  */
 
 namespace Themes\RestApiTheme\AdminControllers;
@@ -44,15 +43,14 @@ class ClientController extends RozierApp
     public function listAction(
         Request $request
     ) {
-
         $listManager = new EntityListManager(
             $request,
-            $this->get("em"),
+            $this->get('em'),
             'Themes\RestApiTheme\Entities\OAuth2Client',
             [],
-            array(
-              "id" => "DESC"
-            )
+            [
+              'id' => 'DESC'
+            ]
         );
 
         $listManager->handle();
@@ -134,20 +132,20 @@ class ClientController extends RozierApp
     private function createClient($data)
     {
         $client = new OAuth2Client();
-        $client->setName($data["name"]);
-        $client->setRedirectUri($data["redirectUri"]);
-        $client->setClientId(md5(uniqid($data["name"], true)));
-        $client->setClientSecret(md5(md5(uniqid($data["name"], true))));
+        $client->setName($data['name']);
+        $client->setRedirectUri($data['redirectUri']);
+        $client->setClientId(md5(uniqid($data['name'], true)));
+        $client->setClientSecret(md5(md5(uniqid($data['name'], true))));
 
-        $this->get("em")->persist($client);
-        $this->get("em")->flush();
+        $this->get('em')->persist($client);
+        $this->get('em')->flush();
         return $client;
     }
 
     public function editAction(Request $request, $clientId)
     {
         /** @var OAuth2Client $client */
-        $client = $this->get("em")->find("Themes\RestApiTheme\Entities\OAuth2Client", $clientId);
+        $client = $this->get('em')->find('Themes\RestApiTheme\Entities\OAuth2Client', $clientId);
         if ($client === null) {
             return $this->throw404();
         }

@@ -36,12 +36,9 @@
             </table>
             {% endif %}
        	{% form_theme form '@Rozier/forms.html.twig' %}
-        <form id="login-form" class="uk-form uk-form-stacked {% if error %}uk-animation-shake{% endif %}" action="{{ path('authorizeScopePage') }}" method="post" {{ form_enctype(form) }}>
-            {{ form_widget(form) }}
-            {{ form_rest(form) }}
-            <!-- {{ form_widget(form.approve) }}
-            {{ form_widget(form.cancel) }} -->
-    	</form>
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
     </div>
 </section>
 {% endblock %}

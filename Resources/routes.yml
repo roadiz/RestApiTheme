@@ -1,24 +1,39 @@
 defaultRemoveTrailingSlash:
     path: /{url}
-    defaults: { _controller: Themes\RestApiTheme\RestApiThemeApp::removeTrailingSlashAction }
+    defaults:
+        _controller: Themes\RestApiTheme\RestApiThemeApp::removeTrailingSlashAction
     requirements:
         url: .*/$
     methods: [GET]
 
 authorizeApiPage:
     path: /oauth
-    defaults: { _controller: Themes\RestApiTheme\Controllers\AuthController::oauthAction}
+    defaults:
+        _controller: Themes\RestApiTheme\Controllers\AuthController::oauthAction
 
 signInPage:
     path: /signin
-    defaults: { _controller: Themes\RestApiTheme\Controllers\ApiLoginController::indexAction}
+    defaults:
+        _controller: Themes\RestApiTheme\Controllers\ApiLoginController::indexAction
 
 authorizeScopePage:
     path: /authorize
-    defaults: { _controller: Themes\RestApiTheme\Controllers\AuthController::authorizeAction}
-
-accessTokenPage:
-    path: /access_token
     methods:
-      - POST
-    defaults: { _controller: Themes\RestApiTheme\Controllers\AuthController::accessTokenAction}
+        - GET
+        - POST
+    defaults:
+        _controller: Themes\RestApiTheme\Controllers\AuthController::authorizeAction
+
+tokenInfoPage:
+    path: /token
+    methods:
+        - GET
+    defaults:
+        _controller: Themes\RestApiTheme\Controllers\TokenInfoController::defaultAction
+
+tokenCreationPage:
+    path: /token
+    methods:
+        - POST
+    defaults:
+        _controller: Themes\RestApiTheme\Controllers\AuthController::accessTokenAction
