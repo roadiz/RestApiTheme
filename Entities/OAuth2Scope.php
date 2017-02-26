@@ -42,7 +42,7 @@ use RZ\Roadiz\Core\AbstractEntities\AbstractEntity;
 class OAuth2Scope extends AbstractEntity
 {
     /**
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string", nullable=false, unique=true)
      * @var string
      */
     private $name;

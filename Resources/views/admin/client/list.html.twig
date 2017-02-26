@@ -15,7 +15,7 @@
 {% block content %}
 <section class="content-global">
     <header class="content-header">
-        <h1 class="content-title">{% trans %} api.client.management {% endtrans %}</h1>
+        <h1 class="content-title">{% trans %}api.list.client{% endtrans %}</h1>
         {% include 'widgets/countFiltersBar.html.twig' %}
     </header>
 
@@ -49,7 +49,7 @@
                         <td>
                         {% spaceless %}
                             <a class="uk-button uk-button-content uk-button-small" href="{{ path('clientAdminEditPage', { clientId: client.id }) }}"
-                                title="{% trans %}edit.client{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-pencil"></i></a>
+                                title="{% trans %}edit{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-pencil"></i></a>
                             <a class="uk-button uk-button-content uk-button-small uk-button-danger uk-button-table-delete" href="{{ path('clientAdminDeletePage', { clientId: client.id }) }}"
                                 title="{% trans %}delete{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-trash-o"></i></a>
                         {% endspaceless %}

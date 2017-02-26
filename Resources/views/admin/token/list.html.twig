@@ -15,15 +15,9 @@
 {% block content %}
 <section class="content-global">
     <header class="content-header">
-        <h1 class="content-title">{% trans %}api.list.scope{% endtrans %}</h1>
+        <h1 class="content-title">{% trans %}api.list.token{% endtrans %}</h1>
         {% include 'widgets/countFiltersBar.html.twig' %}
     </header>
-
-<div class="content-header-action-menu">
-    <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
-        <a href="{{ path('scopeAdminAddPage') }}" class="uk-button"><i class="uk-icon-rz-plus"></i> {% trans %}create.a.scope{% endtrans %} </a>
-    </div>
-</div>
 
     {% include 'widgets/filtersBar.html.twig' %}
 
@@ -32,21 +26,21 @@
             <table class="content-table uk-table">
                 <thead>
                     <tr>
-                        <th>{% trans %}scope.name{% endtrans %}</th>
-                        <th>{% trans %}scope.description{% endtrans %}</th>
+                        <th>{% trans %}access_token{% endtrans %}</th>
+                        <th>{% trans %}token.expiresAt{% endtrans %}</th>
+                        <th>{% trans %}token.client{% endtrans %}</th>
                         <th>{% trans %}actions{% endtrans %}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for scope in scopes %}
+                    {% for token in tokens %}
                     <tr>
-                        <td>{{ scope.name }}</td>
-                        <td>{{ scope.description }}</td>
+                        <td>{{ token.value }}</td>
+                        <td>{{ token.expireTime|localizeddate('short', 'short') }}</td>
+                        <td><a href="{{ path('clientAdminEditPage', { clientId: token.session.client.id }) }}">{{ token.session.client.name }}</a></td>
                         <td>
                         {% spaceless %}
-                            <a class="uk-button uk-button-content uk-button-small" href="{{ path('scopeAdminEditPage', { scopeId: scope.id }) }}"
-                                title="{% trans %}edit{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-pencil"></i></a>
-                            <a class="uk-button uk-button-content uk-button-small uk-button-danger uk-button-table-delete" href="{{ path('scopeAdminDeletePage', { scopeId: scope.id }) }}"
+                            <a class="uk-button uk-button-content uk-button-small uk-button-danger uk-button-table-delete" href="{{ path('tokenAdminDeletePage', { tokenId: token.id }) }}"
                                 title="{% trans %}delete{% endtrans %}" data-uk-tooltip="{animation:true}"><i class="uk-icon-rz-trash-o"></i></a>
                         {% endspaceless %}
                         </td>

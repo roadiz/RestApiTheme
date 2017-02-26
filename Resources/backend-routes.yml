@@ -11,12 +11,13 @@ clientAdminEditPage:
     defaults: { _controller: Themes\RestApiTheme\AdminControllers\ClientController::editAction }
     requirements:
         clientId : "^[0-9]+$"
-
 clientAdminDeletePage:
     path:     /rz-admin/api/client/delete/{clientId}
     defaults: { _controller: Themes\RestApiTheme\AdminControllers\ClientController::deleteAction }
     requirements:
         clientId : "^[0-9]+$"
+
+
 scopeAdminListPage:
     path:     /rz-admin/api/scope
     defaults: { _controller: Themes\RestApiTheme\AdminControllers\ScopeController::listAction }
@@ -36,3 +37,12 @@ scopeAdminDeletePage:
     defaults: { _controller: Themes\RestApiTheme\AdminControllers\ScopeController::deleteAction }
     requirements:
         scopeId : "^[0-9]+$"
+
+tokenAdminListPage:
+    path:     /rz-admin/api/token
+    defaults: { _controller: Themes\RestApiTheme\AdminControllers\TokenController::listAction }
+tokenAdminDeletePage:
+    path:     /rz-admin/api/token/delete/{tokenId}
+    defaults: { _controller: Themes\RestApiTheme\AdminControllers\TokenController::deleteAction }
+    requirements:
+        tokenId : "^[0-9]+$"

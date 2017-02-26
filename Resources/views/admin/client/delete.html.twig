@@ -3,22 +3,22 @@
 {% block content %}
 <section class="content-global">
 
-	<header class="content-header header-client header-client-delete">
+    <header class="content-header header-client header-client-delete">
         <h1 class="content-title node-delete-title">{{ "delete.client.%name%"|trans({'%name%': client.name})|truncate(25, true, '[…]') }}</h1>
         {% include '@RestApiTheme/admin/client/navBack.html.twig' %}
     </header>
 
-	<article class="content content-delete content-client-delete content-no-action-menu">
-		{% form_theme form 'forms.html.twig' %}
-		<form class="uk-form uk-form-stacked" action="#" method="post" {{ form_enctype(form) }}>
-		    {{ form_widget(form) }}
-		    <fieldset data-uk-margin>
-		    	<legend class="delete-legend">{% trans %}are_you_sure.delete.client.and.data{% endtrans %}</legend>
-		    	<a href="{{ path('clientAdminListPage') }}" class="uk-button"><i class="uk-icon-rz-back-parent"></i> {% trans %}cancel{% endtrans %}</a>
-		    	<button class="uk-button uk-button-danger" type="submit"><i class="uk-icon-rz-trash-o"></i> {% trans %}delete{% endtrans %}</button>
-	   		</fieldset>
-		</form>
-	</article>
+    <article class="content content-delete content-client-delete content-no-action-menu">
+        {% form_theme form 'forms.html.twig' %}
+        <form class="uk-form uk-form-stacked" action="#" method="post" {{ form_enctype(form) }}>
+            {{ form_widget(form) }}
+            <fieldset data-uk-margin>
+                <legend class="delete-legend">{% trans %}are_you_sure.delete.client.and.data{% endtrans %}</legend>
+                <a href="{{ path('clientAdminListPage') }}" class="uk-button"><i class="uk-icon-rz-back-parent"></i> {% trans %}cancel{% endtrans %}</a>
+                <button class="uk-button uk-button-danger" type="submit"><i class="uk-icon-rz-trash-o"></i> {% trans %}delete{% endtrans %}</button>
+            </fieldset>
+        </form>
+    </article>
 
 </section>
 {% endblock %}

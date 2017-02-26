@@ -62,21 +62,27 @@ class RestApiThemeApp extends FrontendController
              * Add a test entry in your Backoffice
              */
             $entries['api'] = [
-                'name' => 'Manage API',
+                'name' => 'rest.api',
                 'path' => null,
-                'icon' => 'uk-icon-file-text-o',
+                'icon' => 'uk-icon-exchange',
                 'roles' => null,
                 'subentries' => [
                     'clientList' => [
                         'name' => 'api.list.client',
                         'path' => $urlGenerator->generate('clientAdminListPage'),
-                        'icon' => 'uk-icon-file-text-o',
+                        'icon' => 'uk-icon-users',
                         'roles' => null
                     ],
                     'scopeList' => [
                         'name' => 'api.list.scope',
                         'path' => $urlGenerator->generate('scopeAdminListPage'),
-                        'icon' => 'uk-icon-file-text-o',
+                        'icon' => 'uk-icon-eye',
+                        'roles' => null
+                    ],
+                    'tokenList' => [
+                        'name' => 'api.list.token',
+                        'path' => $urlGenerator->generate('tokenAdminListPage'),
+                        'icon' => 'uk-icon-ticket',
                         'roles' => null
                     ]
                 ]

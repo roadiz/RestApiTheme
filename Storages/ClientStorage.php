@@ -71,8 +71,10 @@ class ClientStorage extends AbstractStorage implements ClientInterface
     public function getBySession(SessionEntity $session)
     {
         /** @var OAuth2Session $result */
-        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Session')->find($session->getId());
-        if ($result !== null) {
+        $result = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2Session')
+            ->find($session->getId());
+        if ($result !== null && null !== $result->getClient()) {
             $client = new ClientEntity($this->server);
             $client->hydrate([
                 'id' => $result->getClient()->getClientId(),

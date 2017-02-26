@@ -34,18 +34,35 @@ use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AccessTokenInterface;
 use Themes\RestApiTheme\Entities\OAuth2AccessToken;
+use Themes\RestApiTheme\Entities\OAuth2Scope;
+use Themes\RestApiTheme\Entities\OAuth2Session;
 
 class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
 {
+    /**
+     * @param $token
+     * @return bool
+     */
+    protected function exists($token)
+    {
+        $result = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+            ->findOneByValue($token);
+
+        return $result !== null;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function get($token)
     {
-        $result = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')->findOneByValue($token);
+        $result = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+            ->findOneByValue($token);
         if ($result !== null) {
-            $token = (new AccessTokenEntity($this->server))
-                ->setId($result->getValue())
+            $token = new AccessTokenEntity($this->server);
+            $token->setId($result->getValue())
                 ->setExpireTime($result->getExpireTime()->getTimestamp());
             return $token;
         }
@@ -57,7 +74,9 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function getScopes(AccessTokenEntity $token)
     {
-        $accessToken = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+        /** @var OAuth2AccessToken $accessToken */
+        $accessToken = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
             ->findOneByValue($token->getId());
 
         $response = [];
@@ -78,19 +97,26 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function create($token, $expireTime, $sessionId)
     {
+        /** @var OAuth2Session $session */
         $session = $this->em->find('Themes\RestApiTheme\Entities\OAuth2Session', $sessionId);
 
-        if (null !== $session) {
-            $accessToken = new OAuth2AccessToken();
-            $accessToken->setValue($token);
-            $datetime = new \DateTime();
-            $accessToken->setExpireTime($datetime->setTimestamp($expireTime));
-            $accessToken->setSession($session);
+        /** @var OAuth2AccessToken $accessToken */
+        $accessToken = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+            ->findOneBySession($session);
 
+        if (null !== $session &&
+            null === $accessToken) {
+            $accessToken = new OAuth2AccessToken();
             $this->em->persist($accessToken);
-            $this->em->flush();
-            $this->logger->warning('New OAuth2AccessToken id#' . $accessToken->getId(), ['token' => $accessToken]);
         }
+
+        $accessToken->setValue($token);
+        $datetime = new \DateTime();
+        $accessToken->setExpireTime($datetime->setTimestamp($expireTime));
+        $accessToken->setSession($session);
+        $this->em->flush();
+        $this->logger->info('New OAuth2AccessToken id#' . $accessToken->getId(), ['token' => $accessToken]);
     }
 
     /**
@@ -98,11 +124,17 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function associateScope(AccessTokenEntity $token, ScopeEntity $scope)
     {
-        $accessToken = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+        /** @var OAuth2AccessToken $accessToken */
+        $accessToken = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
             ->findOneByValue($token->getId());
-        $scope = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Scope')
+        /** @var OAuth2Scope $scope */
+        $scope = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2Scope')
             ->findOneByName($scope->getId());
+
         $accessToken->addScope($scope);
+        $scope->addAccessToken($accessToken);
 
         $this->em->flush();
     }
@@ -112,9 +144,10 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function delete(AccessTokenEntity $token)
     {
-        $accessToken = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
+        $accessToken = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AccessToken')
             ->findOneByValue($token->getId());
-        $this->logger->warning('Delete OAuth2AccessToken id#' . $accessToken->getId(), ['token' => $accessToken]);
+        $this->logger->info('Delete OAuth2AccessToken id#' . $accessToken->getId(), ['token' => $accessToken]);
         $this->em->remove($accessToken);
         $this->em->flush();
     }

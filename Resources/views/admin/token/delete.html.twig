@@ -3,18 +3,18 @@
 {% block content %}
 <section class="content-global">
 
-    <header class="content-header header-scope header-scope-delete">
-        <h1 class="content-title node-delete-title">{{ "delete.scope.%name%"|trans({'%name%': scope.name})|truncate(25, true, '[…]') }}</h1>
-        {% include '@RestApiTheme/admin/scope/navBack.html.twig' %}
+    <header class="content-header header-token header-token-delete">
+        <h1 class="content-title node-delete-title">{{ "delete.token.%name%"|trans({'%name%': token.value})|truncate(25, true, '[…]') }}</h1>
+        {% include '@RestApiTheme/admin/token/navBack.html.twig' %}
     </header>
 
-    <article class="content content-delete content-scope-delete content-no-action-menu">
+    <article class="content content-delete content-token-delete content-no-action-menu">
         {% form_theme form 'forms.html.twig' %}
         <form class="uk-form uk-form-stacked" action="#" method="post" {{ form_enctype(form) }}>
             {{ form_widget(form) }}
             <fieldset data-uk-margin>
-                <legend class="delete-legend">{% trans %}are_you_sure.delete.scope.and.data{% endtrans %}</legend>
-                <a href="{{ path('scopeAdminListPage') }}" class="uk-button"><i class="uk-icon-rz-back-parent"></i> {% trans %}cancel{% endtrans %}</a>
+                <legend class="delete-legend">{% trans %}are_you_sure.delete.token.and.data{% endtrans %}</legend>
+                <a href="{{ path('tokenAdminListPage') }}" class="uk-button"><i class="uk-icon-rz-back-parent"></i> {% trans %}cancel{% endtrans %}</a>
                 <button class="uk-button uk-button-danger" type="submit"><i class="uk-icon-rz-trash-o"></i> {% trans %}delete{% endtrans %}</button>
             </fieldset>
         </form>

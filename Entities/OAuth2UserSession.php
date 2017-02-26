@@ -31,6 +31,7 @@
 namespace Themes\RestApiTheme\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use RZ\Roadiz\Core\Entities\User;
 
 /**
  * OAuth2Session store all information about OAuth2 scope.
@@ -59,7 +60,7 @@ class OAuth2UserSession extends OAuth2Session
      *
      * @return $this
      */
-    public function setOwner($owner) {
+    public function setOwner(User $owner) {
         $this->owner = $owner;
         return $this;
     }

@@ -95,12 +95,13 @@ class OAuth2AccessToken extends AbstractValuedEntity
 
     /**
      * @param OAuth2Scope $scope
-     *
      * @return $this
      */
-    public function addScope($scope)
+    public function addScope(OAuth2Scope $scope)
     {
-        $this->scopes->add($scope);
+        if (!$this->scopes->contains($scope)) {
+            $this->scopes->add($scope);
+        }
         return $this;
     }
 

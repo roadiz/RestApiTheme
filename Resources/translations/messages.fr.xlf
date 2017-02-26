@@ -1,35 +1,121 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-    <file original="none" source-language="en-US" datatype="plaintext">
-        <body>
-            <trans-unit id="hello.world">
-                <source>hello.world</source>
-                <target>Bonjour toi !</target>
-            </trans-unit>
-            <trans-unit id="nodeName">
-                <source>node.name.is.%name%</source>
-                <target>C’est le nœud « %name% »</target>
-            </trans-unit>
-            <trans-unit id="translationName">
-                <source>translation.is.%name%</source>
-                <target>On est en « %name% »</target>
-            </trans-unit>
-            <trans-unit id="cookie_choice.consent_message">
-                <source>cookie_choice.consent_message</source>
-                <target>En poursuivant votre navigation sur ce site, vous acceptez l’utilisation de cookies à des fins de mesures d’audience.</target>
-            </trans-unit>
-            <trans-unit id="cookie_choice.close_message">
-                <source>cookie_choice.close_message</source>
-                <target>Fermer</target>
-            </trans-unit>
-            <trans-unit id="cookie_choice.find_out_more_message">
-                <source>cookie_choice.find_out_more_message</source>
-                <target>En savoir plus</target>
-            </trans-unit>
-            <trans-unit id="no_javascript_message">
-                <source>no_javascript_message</source>
-                <target>JavaScript est désactivé sur votre navigateur ou celui-ci ne supporte pas cette technologie. Veuillez l'activez ou mettre à jour votre navigateur pour une meilleure expérience de navigation.</target>
-            </trans-unit>
-        </body>
-    </file>
+  <file source-language="none" original="" target-language="fr" datatype="plaintext">
+    <body>
+      <trans-unit id="add.client">
+        <source>add.client</source>
+        <target>Ajouter le client</target>
+        <note>Add button label</note>
+      </trans-unit>
+      <trans-unit id="add.scope">
+        <source>add.scope</source>
+        <target>Ajouter le scope</target>
+        <note>Submit add button label</note>
+      </trans-unit>
+      <trans-unit id="api.list.client">
+        <source>api.list.client</source>
+        <target>Liste des clients</target>
+        <note>Admin section title</note>
+      </trans-unit>
+      <trans-unit id="api.list.scope">
+        <source>api.list.scope</source>
+        <target>Liste des scopes</target>
+        <note>Admin section title</note>
+      </trans-unit>
+      <trans-unit id="are_you_sure.delete.client.and.data">
+        <source>are_you_sure.delete.client.and.data</source>
+        <target>Êtes-vous sûr(e) de vouloir supprimer ce client ainsi que tous les accès associés ?</target>
+      </trans-unit>
+      <trans-unit id="are_you_sure.delete.scope.and.data">
+        <source>are_you_sure.delete.scope.and.data</source>
+        <target>Êtes-vous sûr(e) de vouloir supprimer ce scope ainsi que tous les accès associés ?</target>
+      </trans-unit>
+      <trans-unit id="authorize.scope">
+        <source>authorize.scope</source>
+        <target>Demande d’autorisation</target>
+        <note>Title for authorize page</note>
+      </trans-unit>
+      <trans-unit id="back_to.clients.list">
+        <source>back_to.clients.list</source>
+        <target>Retourner à la liste des clients</target>
+      </trans-unit>
+      <trans-unit id="client.id">
+        <source>client.id</source>
+        <target>Identifiant client</target>
+      </trans-unit>
+      <trans-unit id="client.secret">
+        <source>client.secret</source>
+        <target>Clé secrète</target>
+      </trans-unit>
+      <trans-unit id="create.a.client">
+        <source>create.a.client</source>
+        <target>Créer un client</target>
+        <note>Button label</note>
+      </trans-unit>
+      <trans-unit id="create.a.scope">
+        <source>create.a.scope</source>
+        <target>Créer un scope</target>
+        <note>Button label and page title</note>
+      </trans-unit>
+      <trans-unit id="delete.client.%name%">
+        <source>delete.client.%name%</source>
+        <target>Supprimer le client “%name%”</target>
+        <note>Delete page title</note>
+      </trans-unit>
+      <trans-unit id="delete.scope.%name%">
+        <source>delete.scope.%name%</source>
+        <target>Supprimer le scope %name%</target>
+      </trans-unit>
+      <trans-unit id="edit.client">
+        <source>edit.client</source>
+        <target>Éditer le client</target>
+        <note>Edit page title</note>
+      </trans-unit>
+      <trans-unit id="edit.scope">
+        <source>edit.scope</source>
+        <target>Éditer le scope</target>
+      </trans-unit>
+      <trans-unit id="oauth.client.%name%.created">
+        <source>oauth.client.%name%.created</source>
+        <target>Le client OAuth2 %name% a été créé.</target>
+      </trans-unit>
+      <trans-unit id="oauth.client.%name%.deleted">
+        <source>oauth.client.%name%.deleted</source>
+        <target>Le client OAuth2 %name% a été supprimé.</target>
+      </trans-unit>
+      <trans-unit id="oauth.client.%name%.updated">
+        <source>oauth.client.%name%.updated</source>
+        <target>Le client OAuth2 %name% a été mis à jour.</target>
+      </trans-unit>
+      <trans-unit id="oauth.scope.%name%.created">
+        <source>oauth.scope.%name%.created</source>
+        <target>Le scope OAuth2 %name% a été créé.</target>
+      </trans-unit>
+      <trans-unit id="oauth.scope.%name%.deleted">
+        <source>oauth.scope.%name%.deleted</source>
+        <target>Le scope OAuth2 %name% a été supprimé.</target>
+      </trans-unit>
+      <trans-unit id="oauth.scope.%name%.updated">
+        <source>oauth.scope.%name%.updated</source>
+        <target>Le scope OAuth2 %name% a été mis à jour.</target>
+      </trans-unit>
+      <trans-unit id="redirect.uri">
+        <source>redirect.uri</source>
+        <target>URI de redirection</target>
+      </trans-unit>
+      <trans-unit id="rest.api">
+        <source>rest.api</source>
+        <target>Gestion de l’API REST</target>
+        <note>Admin section title</note>
+      </trans-unit>
+      <trans-unit id="scope.description">
+        <source>scope.description</source>
+        <target>Description du scope</target>
+      </trans-unit>
+      <trans-unit id="scope.name">
+        <source>scope.name</source>
+        <target>Nom du scope</target>
+      </trans-unit>
+    </body>
+  </file>
 </xliff>

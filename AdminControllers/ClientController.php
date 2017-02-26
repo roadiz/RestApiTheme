@@ -29,12 +29,15 @@
 
 namespace Themes\RestApiTheme\AdminControllers;
 
+use RZ\Roadiz\Core\Entities\Role;
 use RZ\Roadiz\Core\Exceptions\EntityAlreadyExistsException;
 use RZ\Roadiz\Core\ListManagers\EntityListManager;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Themes\RestApiTheme\Entities\OAuth2Client;
+use Themes\RestApiTheme\Forms\OAuth2ClientType;
 use Themes\RestApiTheme\RestApiThemeApp;
 use Themes\Rozier\RozierApp;
 
@@ -43,6 +46,8 @@ class ClientController extends RozierApp
     public function listAction(
         Request $request
     ) {
+        $this->validateAccessForRole(Role::ROLE_BACKEND_USER);
+
         $listManager = new EntityListManager(
             $request,
             $this->get('em'),
@@ -68,37 +73,22 @@ class ClientController extends RozierApp
      */
     public function addAction(Request $request)
     {
-        $form = $this->get('formFactory')
-            ->createBuilder()
-            ->add(
-                'name',
-                'text',
-                array(
-                    'label' => $this->getTranslator()->trans('name'),
-                    'constraints' => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->add(
-                'redirectUri',
-                'text',
-                array(
-                    'label' => $this->getTranslator()->trans('redirect.uri'),
-                    'constraints' => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->getForm();
+        $this->validateAccessForRole(Role::ROLE_BACKEND_USER);
+
+        $client = new OAuth2Client();
+        $form = $this->createForm(new OAuth2ClientType($this->get('em')), $client);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             try {
-                $client = $this->createClient($form->getData());
+                $client->setClientId(md5(uniqid($client->getName(), true)));
+                $client->setClientSecret(md5(md5(uniqid($client->getName(), true))));
+                $this->get('em')->persist($client);
+                $this->get('em')->flush();
+
                 $msg = $this->getTranslator()->trans(
                     'oauth.client.%name%.created',
-                    array('%name%'=>$client->getName())
+                    ['%name%'=>$client->getName()]
                 );
                 $this->publishConfirmMessage($request, $msg);
 
@@ -111,35 +101,13 @@ class ClientController extends RozierApp
 
                 return $response->send();
             } catch (EntityAlreadyExistsException $e) {
-                $this->publishErrorMessage($request, $e->getMessage());
-
-                $response = new RedirectResponse(
-                    $this->get('urlGenerator')->generate(
-                        'clientAdminAddPage'
-                    )
-                );
-                $response->prepare($request);
-
-                return $response;
+                $form->addError(new FormError($e->getMessage()));
             }
         }
 
         $this->assignation['form'] = $form->createView();
 
         return $this->render('admin/client/add.html.twig', $this->assignation, null, RestApiThemeApp::getThemeDir());
-    }
-
-    private function createClient($data)
-    {
-        $client = new OAuth2Client();
-        $client->setName($data['name']);
-        $client->setRedirectUri($data['redirectUri']);
-        $client->setClientId(md5(uniqid($data['name'], true)));
-        $client->setClientSecret(md5(md5(uniqid($data['name'], true))));
-
-        $this->get('em')->persist($client);
-        $this->get('em')->flush();
-        return $client;
     }
 
     public function editAction(Request $request, $clientId)
@@ -149,43 +117,15 @@ class ClientController extends RozierApp
         if ($client === null) {
             return $this->throw404();
         }
-        $form = $this->get('formFactory')
-            ->createBuilder()
-            ->add(
-                'name',
-                'text',
-                array(
-                    'data' => $client->getName(),
-                    'label' => $this->getTranslator()->trans('name'),
-                    'constraints' => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->add(
-                'redirectUri',
-                'text',
-                array(
-                    'data' => $client->getRedirectUri(),
-                    'label' => $this->getTranslator()->trans('redirect.uri'),
-                    'constraints' => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->getForm();
+        $form = $this->createForm(new OAuth2ClientType($this->get('em')), $client);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $data = $form->getData();
-            $client->setName($data['name']);
-            $client->setRedirectUri($data['redirectUri']);
-
             $this->get('em')->flush();
 
             $msg = $this->getTranslator()->trans(
-                'client.%name%.updated',
-                array('%name%'=>$client->getName())
+                'oauth.client.%name%.updated',
+                ['%name%'=>$client->getName()]
             );
 
             $this->publishConfirmMessage($request, $msg);
@@ -228,12 +168,12 @@ class ClientController extends RozierApp
         $form->handleRequest($request);
 
         if ($form->isValid() &&
-            $form->getData()['clientId'] == $client->getId()) {
+            $form->get('clientId')->getData() == $client->getId()) {
             $this->get('em')->remove($client);
             $this->get('em')->flush();
             $msg = $this->getTranslator()->trans(
-                'client.%name%.deleted',
-                array('%name%'=>$client->getName())
+                'oauth.client.%name%.deleted',
+                ['%name%'=>$client->getName()]
             );
             $this->publishConfirmMessage($request, $msg);
             /*

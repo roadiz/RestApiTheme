@@ -55,7 +55,7 @@ abstract class OAuth2Session extends AbstractEntity
     abstract public function getOwner();
 
     /**
-     * @ORM\OneToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Client")
+     * @ORM\ManyToOne(targetEntity="Themes\RestApiTheme\Entities\OAuth2Client")
      * @ORM\JoinColumn(name="client_id", referencedColumnName="id", onDelete="CASCADE")
      **/
     private $client;
@@ -95,12 +95,13 @@ abstract class OAuth2Session extends AbstractEntity
 
     /**
      * @param OAuth2Scope $scope
-     *
      * @return $this
      */
-    public function addScope($scope)
+    public function addScope(OAuth2Scope $scope)
     {
-        $this->scopes->add($scope);
+        if (!$this->scopes->contains($scope)) {
+            $this->scopes->add($scope);
+        }
         return $this;
     }
 

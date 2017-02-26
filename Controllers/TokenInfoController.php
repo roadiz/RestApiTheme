@@ -28,7 +28,7 @@
  */
 namespace Themes\RestApiTheme\Controllers;
 
-use League\OAuth2\Server\Exception\AccessDeniedException;
+use League\OAuth2\Server\Exception\OAuthException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TokenInfoController extends ApiController
@@ -42,7 +42,7 @@ class TokenInfoController extends ApiController
         // Check that access token is present
         try {
             $this->server->isValidRequest(false);
-        } catch (AccessDeniedException $e) {
+        } catch (OAuthException $e) {
             return $this->json([
                 'error' => $e->errorType,
                 'error_description' => $e->getMessage(),
@@ -56,7 +56,10 @@ class TokenInfoController extends ApiController
         return $this->json([
             'owner_id' => $session->getOwnerId(),
             'owner_type' => $session->getOwnerType(),
-            'access_token' => $accessToken,
+            'access_token' => [
+                'id' => $accessToken->getId(),
+                'expire_time' => $accessToken->getExpireTime(),
+            ],
             'client_id' => $session->getClient()->getId(),
             'scopes' => $accessToken->getScopes(),
         ]);

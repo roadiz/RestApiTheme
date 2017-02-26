@@ -58,7 +58,7 @@ class OAuth2ClientSession extends OAuth2Session
      *
      * @return $this
      */
-    public function setOwner($owner) {
+    public function setOwner(OAuth2Client $owner) {
         $this->owner = $owner;
         return $this;
     }

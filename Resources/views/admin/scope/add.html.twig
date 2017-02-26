@@ -4,21 +4,20 @@
 <section class="content-global">
 
     <header class="content-header header-node header-node-add">
-    	<h1 class="content-title">{% trans %}add.a.scope{% endtrans %}</h1>
+        <h1 class="content-title">{% trans %}create.a.scope{% endtrans %}</h1>
         {% include '@RestApiTheme/admin/scope/navBack.html.twig' %}
     </header>
 
     <article class="content content-no-action-menu">
-    	{% form_theme form 'forms.html.twig' %}
-    	<form class="uk-form uk-form-stacked" action="#" method="post" {{ form_enctype(form) }}>
-    	    {{ form_widget(form) }}
+        {% form_theme form 'forms.html.twig' %}
+        <form class="uk-form uk-form-stacked" action="#" method="post" {{ form_enctype(form) }}>
+            {{ form_widget(form) }}
             {% spaceless %}
             <button class="uk-button uk-button-primary" type="submit">
-                <i class="uk-icon-plus"></i> {% trans %}add.a.scope{% endtrans %}
+                <i class="uk-icon-plus"></i> {% trans %}add.scope{% endtrans %}
             </button>
             {% endspaceless %}
-    	</form>
+        </form>
     </article>
-
 </section>
 {% endblock %}

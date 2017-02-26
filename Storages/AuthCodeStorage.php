@@ -35,6 +35,7 @@ use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AuthCodeInterface;
 use Themes\RestApiTheme\Entities\OAuth2AuthCode;
+use Themes\RestApiTheme\Entities\OAuth2Scope;
 use Themes\RestApiTheme\Entities\OAuth2Session;
 
 class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
@@ -75,7 +76,9 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
         /** @var OAuth2Session $session */
         $session = $this->em->find('Themes\RestApiTheme\Entities\OAuth2Session', $sessionId);
         /** @var OAuth2AuthCode $authCode */
-        $authCode = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AuthCode')->findOneBySession($session);
+        $authCode = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AuthCode')
+            ->findOneBySession($session);
 
         if ($authCode === null) {
             $authCode = new OAuth2AuthCode();
@@ -117,11 +120,16 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface
      */
     public function associateScope(AuthCodeEntity $token, ScopeEntity $scope)
     {
-        $authCode = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2AuthCode')
+        /** @var OAuth2AuthCode $authCode */
+        $authCode = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2AuthCode')
                          ->findOneByValue($token->getId());
-        $scope = $this->em->getRepository('Themes\RestApiTheme\Entities\OAuth2Scope')
+        /** @var OAuth2Scope $scope */
+        $scope = $this->em
+            ->getRepository('Themes\RestApiTheme\Entities\OAuth2Scope')
                       ->findOneByName($scope->getId());
         $authCode->addScope($scope);
+        $scope->addAuthCode($authCode);
 
         $this->em->flush();
     }
