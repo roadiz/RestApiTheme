@@ -87,7 +87,9 @@ class OAuth2AuthCode extends AbstractValuedEntity
      */
     public function addScope($scope)
     {
-        $this->scopes->add($scope);
+        if (!$this->scopes->contains($scope)) {
+            $this->scopes->add($scope);
+        }
         return $this;
     }
 

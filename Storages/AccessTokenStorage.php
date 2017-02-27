@@ -133,7 +133,6 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
             ->getRepository('Themes\RestApiTheme\Entities\OAuth2Scope')
             ->findOneByName($scope->getId());
 
-        $accessToken->addScope($scope);
         $scope->addAccessToken($accessToken);
 
         $this->em->flush();

@@ -161,10 +161,9 @@ class AuthController extends ApiController
     }
 
     /**
-     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function accessTokenAction(Request $request)
+    public function accessTokenAction()
     {
         $this->prepareApiServer();
 
@@ -182,11 +181,6 @@ class AuthController extends ApiController
                 'error' => $e->errorType,
                 'error_description' => $e->getMessage()
             ], $e->httpStatusCode);
-        } catch (\Exception $e) {
-            return $this->json([
-                'error' => 'General exception',
-                'error_description' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

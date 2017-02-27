@@ -111,7 +111,9 @@ class OAuth2Scope extends AbstractEntity
      */
     public function addAccessToken($accessToken)
     {
-        $this->accessTokens->add($accessToken);
+        if (!$this->accessTokens->contains($accessToken)) {
+            $this->accessTokens->add($accessToken);
+        }
         return $this;
     }
 
@@ -137,7 +139,9 @@ class OAuth2Scope extends AbstractEntity
      */
     public function addAuthCode($authCode)
     {
-        $this->authCodes->add($authCode);
+        if (!$this->authCodes->contains($authCode)) {
+            $this->authCodes->add($authCode);
+        }
         return $this;
     }
 
@@ -162,7 +166,9 @@ class OAuth2Scope extends AbstractEntity
      */
     public function addSession($session)
     {
-        $this->sessions->add($session);
+        if (!$this->sessions->contains($session)) {
+            $this->sessions->add($session);
+        }
         return $this;
     }
 
